@@ -128,12 +128,12 @@
       const res  = await fetch(url);
       const json = await res.json();
       if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
-      const vals = json.values || [];
+      const vals = (json.values || []).slice(0, 10);
       if (!vals.length) throw new Error('Sheet returned no data');
       renderTable(vals);
       setDot('ok'); setStatus(`${vals.length - 1} rows loaded from Google Sheets`);
     } catch (err) {
-      renderTable(SEED);
+      renderTable(SEED.slice(0, 10));
       setDot('warn'); setStatus(`Showing cached data (${err.message})`);
     }
   }
