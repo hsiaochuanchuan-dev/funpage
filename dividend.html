@@ -6,110 +6,78 @@
   <title>Grace — Dividend</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: 'Segoe UI', -apple-system, sans-serif;
-      background: #f0f2f5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background: #f0f2f5; min-height: 100vh;
+      display: flex; flex-direction: column;
     }
-
     header {
       background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-      color: white;
-      padding: 16px 24px;
-      flex-shrink: 0;
+      color: white; padding: 16px 24px; flex-shrink: 0;
     }
     header h1  { font-size: 20px; font-weight: 500; }
     header sub { font-size: 12px; opacity: .85; display: block; margin-top: 2px; }
-
     .statusbar {
       background: white; border-bottom: 1px solid #e0e0e0;
       padding: 7px 24px; display: flex; align-items: center;
       gap: 10px; font-size: 13px; color: #5f6368; flex-shrink: 0;
     }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #34a853; }
-    .dot.spin  { background: #fbbc04; animation: blink 1s infinite; }
-    .dot.warn  { background: #ff9800; }
+    .dot.spin { background: #fbbc04; animation: blink 1s infinite; }
+    .dot.warn { background: #ff9800; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
     main { flex: 1; padding: 20px 24px; overflow: auto; }
-
     .card {
       background: white; border-radius: 10px;
       box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden;
     }
-
     .card-head {
-      padding: 13px 20px;
-      border-bottom: 2px solid #1a73e8;
+      padding: 13px 20px; border-bottom: 2px solid #1a73e8;
       display: flex; justify-content: space-between; align-items: center;
     }
     .card-head h2 { font-size: 14px; font-weight: 700; color: #202124; text-transform: uppercase; letter-spacing: .4px; }
     .card-head span { font-size: 12px; color: #5f6368; }
-
     .tbl-wrap { overflow-x: auto; }
-
     table { width: 100%; border-collapse: collapse; }
-
     thead tr { background: #e8f0fe; }
     th {
       padding: 10px 12px; text-align: left;
-      font-size: 12px; font-weight: 700;
-      color: #1a73e8; white-space: nowrap;
-      border-right: 1px solid #c5d8fb;
+      font-size: 12px; font-weight: 700; color: #1a73e8;
+      white-space: nowrap; border-right: 1px solid #c5d8fb;
     }
     th:last-child { border-right: none; }
-
     td {
-      padding: 9px 12px;
-      font-size: 14px; color: #202124;
-      border-bottom: 1px solid #e8eaed;
-      border-right: 1px solid #e8eaed;
+      padding: 9px 12px; font-size: 14px; color: #202124;
+      border-bottom: 1px solid #e8eaed; border-right: 1px solid #e8eaed;
       white-space: nowrap;
     }
     td:last-child { border-right: none; }
-
     tr:nth-child(even) td { background: #fafafa; }
     tr:hover td { background: #f1f8fe; }
-
-    tr.summary-row td {
-      background: #fce4ec;
-      color: #880e4f;
-      font-weight: 600;
-    }
+    tr.summary-row td { background: #fce4ec; color: #880e4f; font-weight: 600; }
     tr.summary-row:hover td { background: #f8bbd0; }
-
     td.posted { color: #388e3c; font-weight: 600; font-size: 12px; }
-
     footer {
       background: white; border-top: 1px solid #e0e0e0;
-      padding: 10px 24px; font-size: 12px; color: #9aa0a6;
-      flex-shrink: 0;
+      padding: 10px 24px; font-size: 12px; color: #9aa0a6; flex-shrink: 0;
     }
-
     #seasonal-fruit {
       position: fixed; bottom: 18px; left: 18px;
       z-index: 999; pointer-events: none;
       animation: fruit-bob 2.8s ease-in-out infinite;
     }
     #seasonal-fruit .fruit-label {
-      text-align: center; font-size: 11px;
-      color: #5f6368; margin-top: 4px;
-      font-weight: 600; letter-spacing: .3px;
+      text-align: center; font-size: 11px; color: #5f6368;
+      margin-top: 4px; font-weight: 600; letter-spacing: .3px;
     }
-    @keyframes fruit-bob {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-8px); }
-    }
+    @keyframes fruit-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   </style>
 </head>
 <body>
 
 <header>
   <h1>Grace — Dividend Tracker</h1>
-  <sub>OtherNote.xlsx › dividend &nbsp;|&nbsp; A1:G11 &nbsp;|&nbsp; Read-only</sub>
+  <sub>OtherNote.xlsx › dividend &nbsp;|&nbsp; A1:G10 &nbsp;|&nbsp; Read-only</sub>
 </header>
 
 <div class="statusbar">
@@ -133,13 +101,12 @@
 </main>
 
 <footer>Data source: Google Sheets › dividend (read-only)</footer>
-
 <div id="seasonal-fruit"></div>
 
 <script>
   const API_KEY        = 'AIzaSyCQjHQbMlSYHLWWFNhqCwy4u3zisCyknqo';
   const SPREADSHEET_ID = '1JgVO35PwZYDHnzjR22-SgTx6PvrXpAkV';
-  const RANGE          = 'dividend!A1:G11';
+  const RANGE          = 'dividend!A1:G10';
 
   const SEED = [
     ['Institution', 'Product', 'Funding', 'Monthly Average', 'ROI%', 'Frequency', '已過帳'],
@@ -152,7 +119,6 @@
     ['',           '台積電',   '$1,261,505', '',        '',      '',             ''],
     ['',           'TWD',      '$6,542,525', '$52,720', '',      '',             ''],
     ['新光',       'Deposit',  '$6,631,000', '',        '',      '',             ''],
-    ['',           'Available','$88,475',    '',        '',      '',             ''],
   ];
 
   async function loadData() {
@@ -173,20 +139,20 @@
   }
 
   function renderTable(data) {
-    const cols    = data[0];
-    const rows    = data.slice(1);
-    const prodIdx = cols.findIndex(c => /product/i.test(c));
+    const cols     = data[0];
+    const rows     = data.slice(1);
+    const prodIdx  = cols.findIndex(c => /product/i.test(c));
     const postedIdx = cols.findIndex(c => /已過帳/.test(c));
-    const SUMMARY = ['TWD', 'Deposit', 'Available'];
+    const SUMMARY  = ['TWD', 'Deposit', 'Available'];
 
     document.getElementById('thead').innerHTML =
       '<tr>' + cols.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
 
     document.getElementById('tbody').innerHTML = rows.map(row => {
-      const product    = (row[prodIdx] ?? '').trim();
-      const isSummary  = SUMMARY.includes(product);
+      const product   = (row[prodIdx] ?? '').trim();
+      const isSummary = SUMMARY.includes(product);
       const cells = cols.map((_, i) => {
-        const v = row[i] ?? '';
+        const v   = row[i] ?? '';
         const cls = i === postedIdx && v ? ' class="posted"' : '';
         return `<td${cls}>${esc(v)}</td>`;
       }).join('');
@@ -196,9 +162,9 @@
     document.getElementById('rowCount').textContent = rows.length + ' rows';
   }
 
-  function setDot(state) {
+  function setDot(s) {
     document.getElementById('dot').className =
-      'dot' + (state === 'spin' ? ' spin' : state === 'warn' ? ' warn' : '');
+      'dot' + (s === 'spin' ? ' spin' : s === 'warn' ? ' warn' : '');
   }
   function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
   function esc(s) {
@@ -210,123 +176,279 @@
 
   /* ── Seasonal fruit ── */
   (function () {
-    const W = 90, H = 112;
-    const $ = (tag, a, ...kids) => {
-      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-      Object.entries(a||{}).forEach(([k,v]) => el.setAttribute(k,v));
-      kids.forEach(k => el.appendChild(k));
-      return el;
-    };
-    function stem(x1,y1,x2,y2){
-      return $('line',{x1,y1,x2,y2,stroke:'#6b3a1f','stroke-width':2.5,'stroke-linecap':'round'});
+    const W = 100, H = 130;
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, ...kids) {
+      const e = document.createElementNS(SVG_NS, tag);
+      Object.entries(attrs || {}).forEach(([k, v]) => e.setAttribute(k, v));
+      kids.forEach(k => k && e.appendChild(k));
+      return e;
     }
+
+    function svg() { return el('svg', {width:W, height:H, viewBox:`0 0 ${W} ${H}`}); }
+
+    function rg(id, cx, cy, r, stops) {
+      const g = el('radialGradient', {id, cx, cy, r, gradientUnits:'userSpaceOnUse'});
+      stops.forEach(([off, col, op]) =>
+        g.appendChild(el('stop', {'offset':off,'stop-color':col,'stop-opacity':op ?? 1})));
+      return g;
+    }
+
+    function lg(id, x1, y1, x2, y2, stops) {
+      const g = el('linearGradient', {id, x1, y1, x2, y2, gradientUnits:'userSpaceOnUse'});
+      stops.forEach(([off, col, op]) =>
+        g.appendChild(el('stop', {'offset':off,'stop-color':col,'stop-opacity':op ?? 1})));
+      return g;
+    }
+
+    function shine(cx, cy, rx, ry, rot) {
+      return el('ellipse', {cx, cy, rx, ry,
+        transform: rot ? `rotate(${rot},${cx},${cy})` : '',
+        fill:'white', opacity:.28});
+    }
+
     const fruits = {
+
+      /* ── Jan / Feb / Dec : Strawberry ── */
       1: { label:'草莓 Strawberry', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        [[-8,-5],[-1,-14],[8,-5],[15,0],[-15,0]].forEach(([dx,dy])=>
-          s.appendChild($('path',{d:`M45 24 Q${45+dx} ${24+dy} ${45+dx*0.6} 32`,
-            fill:'none',stroke:'#2d8a2d','stroke-width':3,'stroke-linecap':'round'})));
-        s.appendChild($('path',{d:'M45 28 Q66 32 70 60 Q68 88 45 104 Q22 88 20 60 Q24 32 45 28Z',fill:'#e8352a'}));
-        [[34,48],[45,43],[56,48],[31,62],[42,58],[53,62],[37,76],[48,72]].forEach(([x,y])=>
-          s.appendChild($('ellipse',{cx:x,cy:y,rx:2,ry:2.5,fill:'#f5e030'})));
-        s.appendChild($('path',{d:'M30 42 Q36 36 42 40',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':2.5,'stroke-linecap':'round'}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('sg','42','68','44', [['0','#ff6060'],['0.5','#e8202a'],['1','#a01020']]));
+        defs.appendChild(rg('lg','40','30','12', [['0','#55cc44'],['1','#226611']]));
+        s.appendChild(defs);
+        // calyx leaves
+        [  ['M50 36 Q56 14 62 18 Q58 30 50 36Z','#4caf50'],
+           ['M50 36 Q68 22 70 30 Q62 36 50 36Z','#388e3c'],
+           ['M50 36 Q44 14 38 18 Q42 30 50 36Z','#4caf50'],
+           ['M50 36 Q32 22 30 30 Q38 36 50 36Z','#388e3c'],
+           ['M50 36 Q50 12 54 16 Q52 28 50 36Z','#66bb6a'],
+        ].forEach(([d,fill]) => s.appendChild(el('path',{d,fill})));
+        // stem
+        s.appendChild(el('line',{x1:50,y1:14,x2:52,y2:4,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
+        // body — heart-like strawberry shape
+        s.appendChild(el('path',{d:'M50 40 Q72 42 75 68 Q73 96 50 118 Q27 96 25 68 Q28 42 50 40Z', fill:'url(#sg)'}));
+        // seeds
+        [[38,56],[50,50],[62,56],[34,70],[46,65],[58,67],[70,70],[36,84],[50,80],[63,82],[40,97],[54,94]].forEach(([x,y])=>
+          s.appendChild(el('ellipse',{cx:x,cy:y,rx:2.2,ry:2.8,fill:'#f5e642',stroke:'#c8b800','stroke-width':.4})));
+        // shine
+        s.appendChild(shine(38,54,8,5,-30));
         return s;
       }},
+
+      /* ── Mar : Wax Apple 蓮霧 ── */
       3: { label:'蓮霧 Wax Apple', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        s.appendChild(stem(45,4,45,18));
-        s.appendChild($('path',{d:'M45 20 Q63 22 69 52 Q73 76 64 94 Q56 108 45 110 Q34 108 26 94 Q17 76 21 52 Q27 22 45 20Z',fill:'#e8506a'}));
-        s.appendChild($('ellipse',{cx:45,cy:24,rx:9,ry:5,fill:'#c02848',opacity:.6}));
-        s.appendChild($('path',{d:'M33 107 L37 100 L41 107 L45 100 L49 107 L53 100 L57 107',fill:'none',stroke:'#c02848','stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round'}));
-        s.appendChild($('path',{d:'M29 42 Q35 34 42 38',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':2.5,'stroke-linecap':'round'}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('wg','42','65','40', [['0','#ff8fa8'],['0.45','#e8355a'],['1','#8b0a2a']]));
+        defs.appendChild(lg('stemg','50','0','50','20', [['0','#5d4037'],['1','#8d6e63']]));
+        s.appendChild(defs);
+        s.appendChild(el('line',{x1:50,y1:2,x2:50,y2:20,stroke:'url(#stemg)','stroke-width':3,'stroke-linecap':'round'}));
+        // leaf
+        s.appendChild(el('path',{d:'M50 10 Q68 2 70 14 Q60 20 50 12Z', fill:'#43a047'}));
+        s.appendChild(el('path',{d:'M50 10 Q34 4 32 14 Q42 18 50 12Z', fill:'#388e3c'}));
+        // bell body
+        s.appendChild(el('path',{d:'M50 22 Q70 24 76 58 Q80 84 70 104 Q62 120 50 122 Q38 120 30 104 Q20 84 24 58 Q30 24 50 22Z', fill:'url(#wg)'}));
+        // dimple top
+        s.appendChild(el('ellipse',{cx:50,cy:26,rx:10,ry:6,fill:'#9b1030',opacity:.5}));
+        // crown petals at bottom
+        s.appendChild(el('path',{d:'M36 116 Q40 108 44 116 Q48 108 52 116 Q56 108 60 116 Q64 108 68 116',
+          fill:'none',stroke:'#9b1030','stroke-width':2.2,'stroke-linecap':'round','stroke-linejoin':'round'}));
+        s.appendChild(shine(38,48,9,6,-25));
         return s;
       }},
+
+      /* ── Apr : Pineapple 鳳梨 ── */
       4: { label:'鳳梨 Pineapple', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        const defs = $('defs',{}); const clip = $('clipPath',{id:'pc'});
-        clip.appendChild($('ellipse',{cx:45,cy:72,rx:28,ry:35})); defs.appendChild(clip); s.appendChild(defs);
-        [[45,10,43,26,'#1f6e1f',3],[45,10,47,26,'#1f6e1f',3],[45,13,37,27,'#2d8a2d',2.5],[45,13,53,27,'#2d8a2d',2.5],
-         [43,16,30,28,'#3aaa3a',2],[47,16,60,28,'#3aaa3a',2],[41,19,22,30,'#2d8a2d',1.5],[49,19,68,30,'#2d8a2d',1.5]].forEach(([x1,y1,x2,y2,c,w])=>
-          s.appendChild($('line',{x1,y1,x2,y2,stroke:c,'stroke-width':w,'stroke-linecap':'round'})));
-        s.appendChild($('ellipse',{cx:45,cy:72,rx:28,ry:35,fill:'#f5c430'}));
-        const g = $('g',{'clip-path':'url(#pc)'});
-        for(let i=-2;i<8;i++){
-          g.appendChild($('line',{x1:0,y1:37+i*14,x2:90,y2:37+i*14+90,stroke:'#c8950a','stroke-width':.9}));
-          g.appendChild($('line',{x1:0,y1:37+i*14+90,x2:90,y2:37+i*14,stroke:'#c8950a','stroke-width':.9}));
+        const s = svg();
+        const defs = el('defs');
+        const clip = el('clipPath',{id:'pc2'});
+        clip.appendChild(el('ellipse',{cx:50,cy:82,rx:32,ry:40}));
+        defs.appendChild(clip);
+        defs.appendChild(rg('pg','40','68','38', [['0','#ffe066'],['0.5','#f5c430'],['1','#b8760a']]));
+        s.appendChild(defs);
+        // crown leaves — layered for depth
+        const crownLeaves = [
+          {d:'M50 44 Q38 10 34 4 Q40 12 50 44Z', f:'#1b5e20'},
+          {d:'M50 44 Q62 10 66 4 Q60 12 50 44Z', f:'#1b5e20'},
+          {d:'M50 42 Q42 14 36 10 Q43 18 50 42Z', f:'#2e7d32'},
+          {d:'M50 42 Q58 14 64 10 Q57 18 50 42Z', f:'#2e7d32'},
+          {d:'M50 40 Q46 18 42 16 Q47 22 50 40Z', f:'#388e3c'},
+          {d:'M50 40 Q54 18 58 16 Q53 22 50 40Z', f:'#388e3c'},
+          {d:'M50 38 Q50 16 50 12 Q52 22 50 38Z', f:'#43a047'},
+          {d:'M50 40 Q32 22 26 20 Q34 26 50 40Z', f:'#2e7d32'},
+          {d:'M50 40 Q68 22 74 20 Q66 26 50 40Z', f:'#2e7d32'},
+        ];
+        crownLeaves.forEach(({d,f}) => s.appendChild(el('path',{d,fill:f})));
+        // body
+        s.appendChild(el('ellipse',{cx:50,cy:82,rx:32,ry:40,fill:'url(#pg)'}));
+        // scale grid clipped
+        const g = el('g',{'clip-path':'url(#pc2)'});
+        for(let i=-4;i<10;i++){
+          g.appendChild(el('line',{x1:-10,y1:42+i*13,x2:110,y2:42+i*13+120,stroke:'#9a6500','stroke-width':1}));
+          g.appendChild(el('line',{x1:-10,y1:42+i*13+120,x2:110,y2:42+i*13,stroke:'#9a6500','stroke-width':1}));
         }
+        // scale dots at intersections for realism
+        for(let i=0;i<6;i++) for(let j=0;j<5;j++)
+          g.appendChild(el('circle',{cx:22+j*16,cy:50+i*13+(j%2)*6.5,r:2,fill:'#7a4f00',opacity:.4}));
         s.appendChild(g);
-        s.appendChild($('path',{d:'M24 58 Q30 50 36 54',fill:'none',stroke:'rgba(255,255,255,.4)','stroke-width':3,'stroke-linecap':'round'}));
+        // highlight
+        s.appendChild(shine(38,64,10,7,-20));
         return s;
       }},
+
+      /* ── May : Mango 芒果 ── */
       5: { label:'芒果 Mango', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        s.appendChild(stem(46,6,47,20));
-        s.appendChild($('path',{d:'M47 14 Q65 7 66 20 Q56 25 47 16',fill:'#3aaa3a'}));
-        s.appendChild($('path',{d:'M30 30 Q14 48 16 72 Q20 98 45 104 Q68 98 74 72 Q76 50 66 36 Q56 24 45 24 Q37 24 30 30Z',fill:'#f5a623'}));
-        s.appendChild($('ellipse',{cx:56,cy:44,rx:16,ry:13,fill:'#e8652a',opacity:.4}));
-        s.appendChild($('path',{d:'M33 36 Q39 30 45 34',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':2.5,'stroke-linecap':'round'}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('mg','44','72','46', [['0','#ffe066'],['0.4','#f5a623'],['0.8','#e85d20'],['1','#8b3a00']]));
+        defs.appendChild(lg('blushlg','58','40','82','70', [['0','#e8352a'],['1','#e8352a',0]]));
+        s.appendChild(defs);
+        // stem
+        s.appendChild(el('line',{x1:52,y1:10,x2:54,y2:2,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
+        // leaf
+        s.appendChild(el('path',{d:'M52 8 Q72 0 74 12 Q64 18 52 10Z',fill:'#43a047'}));
+        s.appendChild(el('path',{d:'M52 8 L63 6',fill:'none',stroke:'#2e7d32','stroke-width':.8}));
+        // body — kidney/oval mango shape
+        s.appendChild(el('path',{d:'M52 18 Q30 22 22 52 Q16 80 28 104 Q38 120 52 122 Q68 120 78 106 Q90 88 86 62 Q82 38 68 26 Q62 18 52 18Z', fill:'url(#mg)'}));
+        // red blush
+        s.appendChild(el('path',{d:'M52 18 Q30 22 22 52 Q16 80 28 104 Q38 120 52 122 Q68 120 78 106 Q90 88 86 62 Q82 38 68 26 Q62 18 52 18Z', fill:'url(#blushlg)',opacity:.45}));
+        // shine
+        s.appendChild(shine(36,42,10,6,-30));
         return s;
       }},
+
+      /* ── Jun : Lychee 荔枝 ── */
       6: { label:'荔枝 Lychee', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        s.appendChild(stem(45,6,45,22));
-        s.appendChild($('path',{d:'M45 14 Q62 7 63 20 Q53 24 45 16',fill:'#3aaa3a'}));
-        s.appendChild($('circle',{cx:45,cy:64,r:36,fill:'#cc2a3a'}));
-        [[28,48],[44,38],[60,46],[22,62],[38,55],[54,57],[67,63],[28,76],[44,79],[60,77]].forEach(([x,y])=>
-          s.appendChild($('circle',{cx:x,cy:y,r:5.5,fill:'#aa1828',opacity:.75})));
-        s.appendChild($('path',{d:'M28 46 Q34 40 42 44',fill:'none',stroke:'rgba(255,255,255,.4)','stroke-width':2.5,'stroke-linecap':'round'}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('lyg','42','62','42', [['0','#ff6680'],['0.5','#cc1a30'],['1','#6b0010']]));
+        s.appendChild(defs);
+        s.appendChild(el('line',{x1:50,y1:8,x2:50,y2:24,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
+        s.appendChild(el('path',{d:'M50 14 Q66 6 68 18 Q58 24 50 16Z',fill:'#43a047'}));
+        // body
+        s.appendChild(el('circle',{cx:50,cy:72,r:42,fill:'url(#lyg)'}));
+        // bumpy skin texture
+        [[32,52],[50,44],[68,52],[24,68],[40,62],[58,62],[74,68],
+         [28,84],[44,78],[62,80],[76,84],[34,96],[52,92],[68,96]].forEach(([x,y])=>{
+          s.appendChild(el('circle',{cx:x,cy:y,r:7,fill:'none',stroke:'#8b001a','stroke-width':1.2,opacity:.6}));
+          s.appendChild(el('circle',{cx:x,cy:y,r:3.5,fill:'#a01a28',opacity:.5}));
+        });
+        s.appendChild(shine(36,52,11,7,-25));
         return s;
       }},
+
+      /* ── Jul : Longan 龍眼 ── */
       7: { label:'龍眼 Longan', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        [[[45,6],[45,28]],[[45,20],[26,38]],[[45,22],[45,40]],[[45,20],[64,38]],
-         [[26,38],[16,53]],[[26,38],[34,53]],[[64,38],[74,53]]].forEach(([[x1,y1],[x2,y2]])=>
-          s.appendChild($('line',{x1,y1,x2,y2,stroke:'#6b3a1f','stroke-width':1.8})));
-        s.appendChild($('path',{d:'M45 10 Q58 4 60 15 Q52 19 45 12',fill:'#3aaa3a'}));
-        [[16,66,14],[41,54,14],[65,64,14],[33,85,13],[59,87,13]].forEach(([cx,cy,r])=>{
-          s.appendChild($('circle',{cx,cy,r,fill:'#c8a060'}));
-          s.appendChild($('circle',{cx,cy,r:r*0.55,fill:'#8b5e2a',opacity:.4}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('long1','18','72','15',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
+        defs.appendChild(rg('long2','44','58','15',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
+        defs.appendChild(rg('long3','70','70','15',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
+        defs.appendChild(rg('long4','36','92','13',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
+        defs.appendChild(rg('long5','62','94','13',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
+        s.appendChild(defs);
+        // branch stems
+        [ [50,4,50,30],[50,22,28,42],[50,22,50,44],[50,22,72,42],
+          [28,42,18,58],[28,42,36,58],[72,42,76,58] ].forEach(([x1,y1,x2,y2])=>
+          s.appendChild(el('line',{x1,y1,x2,y2,stroke:'#6d4c41','stroke-width':2,'stroke-linecap':'round'})));
+        // leaf at top
+        s.appendChild(el('path',{d:'M50 8 Q62 2 64 12 Q56 18 50 10Z',fill:'#43a047'}));
+        // fruit clusters
+        [[18,72,15,'long1'],[44,58,15,'long2'],[70,70,15,'long3'],[36,92,13,'long4'],[62,94,13,'long5']].forEach(([cx,cy,r,gid])=>{
+          s.appendChild(el('circle',{cx,cy,r,fill:`url(#${gid})`}));
+          // eye mark
+          s.appendChild(el('circle',{cx,cy,r:r*.45,fill:'#5d3a10',opacity:.35}));
+          s.appendChild(el('ellipse',{cx:cx-r*.25,cy:cy-r*.25,rx:r*.22,ry:r*.15,fill:'white',opacity:.35}));
         });
         return s;
       }},
+
+      /* ── Aug : Guava 芭樂 ── */
       8: { label:'芭樂 Guava', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        s.appendChild(stem(45,4,45,18));
-        s.appendChild($('path',{d:'M45 10 Q62 3 63 16 Q53 20 45 12',fill:'#3aaa3a'}));
-        s.appendChild($('circle',{cx:45,cy:62,r:38,fill:'#c8d840'}));
-        s.appendChild($('ellipse',{cx:52,cy:55,rx:20,ry:18,fill:'#dce854',opacity:.55}));
-        s.appendChild($('path',{d:'M24 46 Q30 38 38 42',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':3,'stroke-linecap':'round'}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('gg','42','66','44',[['0','#ddf066'],['0.5','#a8c820'],['1','#5a7800']]));
+        s.appendChild(defs);
+        s.appendChild(el('line',{x1:50,y1:6,x2:50,y2:20,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
+        s.appendChild(el('path',{d:'M50 12 Q66 4 68 16 Q58 22 50 14Z',fill:'#43a047'}));
+        // body
+        s.appendChild(el('circle',{cx:50,cy:72,r:44,fill:'url(#gg)'}));
+        // lighter patch
+        s.appendChild(el('ellipse',{cx:58,cy:62,rx:22,ry:18,fill:'#c8e040',opacity:.5}));
+        // flower-end star at bottom
+        const starPts = [0,1,2,3,4].map(i=>{
+          const a1 = (i*72-90)*Math.PI/180, a2 = ((i*72+36)-90)*Math.PI/180;
+          return `L${(50+11*Math.cos(a1)).toFixed(1)} ${(108+11*Math.sin(a1)).toFixed(1)} L${(50+6*Math.cos(a2)).toFixed(1)} ${(108+6*Math.sin(a2)).toFixed(1)}`;
+        }).join(' ');
+        s.appendChild(el('path',{d:'M50 108 '+starPts+'Z',fill:'#7a9a10'}));
+        s.appendChild(el('circle',{cx:50,cy:108,r:5,fill:'#ffccdd',opacity:.8}));
+        s.appendChild(shine(36,52,11,7,-25));
         return s;
       }},
+
+      /* ── Sep : Pomelo 柚子 ── */
       9: { label:'柚子 Pomelo', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        s.appendChild(stem(45,4,45,20));
-        s.appendChild($('path',{d:'M45 10 Q62 3 63 16 Q53 20 45 12',fill:'#3aaa3a'}));
-        s.appendChild($('ellipse',{cx:45,cy:66,rx:39,ry:41,fill:'#ccd840'}));
-        s.appendChild($('ellipse',{cx:45,cy:68,rx:30,ry:32,fill:'#dce854'}));
-        s.appendChild($('path',{d:'M16 50 Q23 38 33 44',fill:'none',stroke:'rgba(255,255,255,.4)','stroke-width':4,'stroke-linecap':'round'}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('pog','42','72','50',[['0','#f5f080'],['0.5','#d4d820'],['1','#8a9000']]));
+        defs.appendChild(rg('peelg','42','72','50',[['0','#f5f080',0],['0.75','#d4d820',0],['0.85','#b8c010',.6],['1','#8a9000',.8]]));
+        s.appendChild(defs);
+        s.appendChild(el('line',{x1:50,y1:4,x2:50,y2:18,stroke:'#5d4037','stroke-width':3,'stroke-linecap':'round'}));
+        s.appendChild(el('path',{d:'M50 10 Q68 2 70 14 Q60 20 50 12Z',fill:'#43a047'}));
+        // outer peel (thick)
+        s.appendChild(el('ellipse',{cx:50,cy:76,rx:44,ry:46,fill:'url(#pog)'}));
+        // inner fruit visible as lighter center
+        s.appendChild(el('ellipse',{cx:50,cy:76,rx:34,ry:36,fill:'#eef060',opacity:.6}));
+        // peel ring
+        s.appendChild(el('ellipse',{cx:50,cy:76,rx:44,ry:46,fill:'none',stroke:'#a0a800','stroke-width':3,opacity:.4}));
+        // navel top
+        s.appendChild(el('ellipse',{cx:50,cy:30,rx:11,ry:8,fill:'#c8ca10',opacity:.5}));
+        s.appendChild(shine(34,56,14,8,-20));
         return s;
       }},
+
+      /* ── Oct : Persimmon 柿子 ── */
       10: { label:'柿子 Persimmon', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        s.appendChild(stem(45,8,45,22));
-        [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy])=>
-          s.appendChild($('path',{d:`M45 22 Q${45+sx*20} ${22+sy*12} ${45+sx*18} ${22+sy*18} Q45 28 ${45-sx*18} ${22+sy*18} Q${45-sx*20} ${22+sy*12} 45 22Z`,
-            fill:sx===sy?'#3aaa3a':'#2d8a2d'})));
-        s.appendChild($('circle',{cx:45,cy:70,r:38,fill:'#f57c2a'}));
-        s.appendChild($('path',{d:'M18 54 Q26 42 36 48',fill:'none',stroke:'rgba(255,255,255,.45)','stroke-width':3.5,'stroke-linecap':'round'}));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('prg','40','68','46',[['0','#ffcc44'],['0.4','#f57c2a'],['0.85','#c84010'],['1','#7a2000']]));
+        s.appendChild(defs);
+        s.appendChild(el('line',{x1:50,y1:8,x2:52,y2:2,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
+        // 4-leaf calyx
+        [  ['M50 24 Q34 14 30 24 Q38 32 50 26Z','#4caf50'],
+           ['M50 24 Q66 14 70 24 Q62 32 50 26Z','#388e3c'],
+           ['M50 24 Q36 36 38 46 Q46 38 50 26Z','#4caf50'],
+           ['M50 24 Q64 36 62 46 Q54 38 50 26Z','#388e3c'],
+        ].forEach(([d,f])=>s.appendChild(el('path',{d,fill:f})));
+        // body — round slightly flattened
+        s.appendChild(el('ellipse',{cx:50,cy:78,rx:40,ry:44,fill:'url(#prg)'}));
+        // subtle vertical ribs
+        [[-20,0],[20,0],[0,-18],[0,18]].forEach(([dx,dy])=>
+          s.appendChild(el('path',{d:`M50 34 Q${50+dx} ${56+dy} ${50+dx*.4} 120`,fill:'none',stroke:'#c84010','stroke-width':1.2,opacity:.3})));
+        s.appendChild(shine(36,52,12,7,-25));
         return s;
       }},
+
+      /* ── Nov : Sugar Apple 釋迦 ── */
       11: { label:'釋迦 Sugar Apple', draw() {
-        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
-        s.appendChild(stem(45,5,45,20));
-        s.appendChild($('path',{d:'M45 12 Q60 5 62 17 Q52 21 45 14',fill:'#3aaa3a'}));
-        s.appendChild($('circle',{cx:45,cy:64,r:36,fill:'#7aaa50'}));
-        [[30,44],[45,38],[60,44],[22,58],[38,52],[52,52],[67,58],[26,72],[40,66],[55,66],[68,72],[32,84],[46,80],[60,84]].forEach(([x,y])=>
-          s.appendChild($('ellipse',{cx:x,cy:y,rx:9,ry:8,fill:'#6a9840',stroke:'#557830','stroke-width':.8})));
+        const s = svg();
+        const defs = el('defs');
+        defs.appendChild(rg('sag','40','68','46',[['0','#a0d060'],['0.6','#6a9838'],['1','#2e5010']]));
+        s.appendChild(defs);
+        s.appendChild(el('line',{x1:50,y1:6,x2:50,y2:20,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
+        s.appendChild(el('path',{d:'M50 12 Q66 4 68 16 Q58 22 50 14Z',fill:'#2e7d32'}));
+        // base body
+        s.appendChild(el('circle',{cx:50,cy:74,r:42,fill:'url(#sag)'}));
+        // bumpy scale segments
+        [[32,50],[50,44],[68,50],[22,64],[38,58],[58,58],[74,64],
+         [26,78],[42,72],[60,74],[76,78],[30,92],[48,88],[66,90],[78,94]].forEach(([x,y])=>{
+          s.appendChild(el('ellipse',{cx:x,cy:y,rx:11,ry:9,fill:'#7ab840',stroke:'#3a6820','stroke-width':1.2}));
+          s.appendChild(el('ellipse',{cx:x,cy:y,rx:7,ry:5.5,fill:'#90cc50',opacity:.5}));
+        });
+        s.appendChild(shine(34,52,12,7,-20));
         return s;
       }},
-      12: null,
     };
     fruits[2]  = fruits[1];
     fruits[12] = fruits[1];
