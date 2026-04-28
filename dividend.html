@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grace — Dividend</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+      color: white;
+      padding: 16px 24px;
+      flex-shrink: 0;
+    }
+    header h1  { font-size: 20px; font-weight: 500; }
+    header sub { font-size: 12px; opacity: .85; display: block; margin-top: 2px; }
+
+    .statusbar {
+      background: white; border-bottom: 1px solid #e0e0e0;
+      padding: 7px 24px; display: flex; align-items: center;
+      gap: 10px; font-size: 13px; color: #5f6368; flex-shrink: 0;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #34a853; }
+    .dot.spin  { background: #fbbc04; animation: blink 1s infinite; }
+    .dot.warn  { background: #ff9800; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    main { flex: 1; padding: 20px 24px; overflow: auto; }
+
+    .card {
+      background: white; border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden;
+    }
+
+    .card-head {
+      padding: 13px 20px;
+      border-bottom: 2px solid #1a73e8;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-head h2 { font-size: 14px; font-weight: 700; color: #202124; text-transform: uppercase; letter-spacing: .4px; }
+    .card-head span { font-size: 12px; color: #5f6368; }
+
+    .tbl-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr { background: #e8f0fe; }
+    th {
+      padding: 10px 12px; text-align: left;
+      font-size: 12px; font-weight: 700;
+      color: #1a73e8; white-space: nowrap;
+      border-right: 1px solid #c5d8fb;
+    }
+    th:last-child { border-right: none; }
+
+    td {
+      padding: 9px 12px;
+      font-size: 14px; color: #202124;
+      border-bottom: 1px solid #e8eaed;
+      border-right: 1px solid #e8eaed;
+      white-space: nowrap;
+    }
+    td:last-child { border-right: none; }
+
+    tr:nth-child(even) td { background: #fafafa; }
+    tr:hover td { background: #f1f8fe; }
+
+    tr.summary-row td {
+      background: #fce4ec;
+      color: #880e4f;
+      font-weight: 600;
+    }
+    tr.summary-row:hover td { background: #f8bbd0; }
+
+    td.posted { color: #388e3c; font-weight: 600; font-size: 12px; }
+
+    footer {
+      background: white; border-top: 1px solid #e0e0e0;
+      padding: 10px 24px; font-size: 12px; color: #9aa0a6;
+      flex-shrink: 0;
+    }
+
+    #seasonal-fruit {
+      position: fixed; bottom: 18px; left: 18px;
+      z-index: 999; pointer-events: none;
+      animation: fruit-bob 2.8s ease-in-out infinite;
+    }
+    #seasonal-fruit .fruit-label {
+      text-align: center; font-size: 11px;
+      color: #5f6368; margin-top: 4px;
+      font-weight: 600; letter-spacing: .3px;
+    }
+    @keyframes fruit-bob {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Grace — Dividend Tracker</h1>
+  <sub>OtherNote.xlsx › dividend &nbsp;|&nbsp; A1:G11 &nbsp;|&nbsp; Read-only</sub>
+</header>
+
+<div class="statusbar">
+  <div class="dot" id="dot"></div>
+  <span id="statusMsg">Loading…</span>
+</div>
+
+<main>
+  <div class="card">
+    <div class="card-head">
+      <h2>Dividend</h2>
+      <span id="rowCount"></span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>Data source: Google Sheets › dividend (read-only)</footer>
+
+<div id="seasonal-fruit"></div>
+
+<script>
+  const API_KEY        = 'AIzaSyCQjHQbMlSYHLWWFNhqCwy4u3zisCyknqo';
+  const SPREADSHEET_ID = '1JgVO35PwZYDHnzjR22-SgTx6PvrXpAkV';
+  const RANGE          = 'dividend!A1:G11';
+
+  const SEED = [
+    ['Institution', 'Product', 'Funding', 'Monthly Average', 'ROI%', 'Frequency', '已過帳'],
+    ['HSBC',       '聯博',     '$146,500',   '$1,192',  '9.8%',  '每月初',       '202604'],
+    ['',           '富蘭克林', '$83,500',    '$702',    '10.1%', '1,4,7,11月初', '202604'],
+    ['',           'TWD',      '$7,130,000', '$58,693', '',      '',             ''],
+    ['富貴角10號', '0056',     '$2,276,211', '$17,320', '9.1%',  '2,5,8,11月中', '202602'],
+    ['',           '00900',    '$2,302,927', '$12,000', '6.3%',  '每月20日',     '202603'],
+    ['',           '00919',    '$701,882',   '$23,400', '13%',   '1,4,7,10月中', '202604'],
+    ['',           '台積電',   '$1,261,505', '',        '',      '',             ''],
+    ['',           'TWD',      '$6,542,525', '$52,720', '',      '',             ''],
+    ['新光',       'Deposit',  '$6,631,000', '',        '',      '',             ''],
+    ['',           'Available','$88,475',    '',        '',      '',             ''],
+  ];
+
+  async function loadData() {
+    setDot('spin'); setStatus('Loading data from Google Sheets…');
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
+      const res  = await fetch(url);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
+      const vals = json.values || [];
+      if (!vals.length) throw new Error('Sheet returned no data');
+      renderTable(vals);
+      setDot('ok'); setStatus(`${vals.length - 1} rows loaded from Google Sheets`);
+    } catch (err) {
+      renderTable(SEED);
+      setDot('warn'); setStatus(`Showing cached data (${err.message})`);
+    }
+  }
+
+  function renderTable(data) {
+    const cols    = data[0];
+    const rows    = data.slice(1);
+    const prodIdx = cols.findIndex(c => /product/i.test(c));
+    const postedIdx = cols.findIndex(c => /已過帳/.test(c));
+    const SUMMARY = ['TWD', 'Deposit', 'Available'];
+
+    document.getElementById('thead').innerHTML =
+      '<tr>' + cols.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+
+    document.getElementById('tbody').innerHTML = rows.map(row => {
+      const product    = (row[prodIdx] ?? '').trim();
+      const isSummary  = SUMMARY.includes(product);
+      const cells = cols.map((_, i) => {
+        const v = row[i] ?? '';
+        const cls = i === postedIdx && v ? ' class="posted"' : '';
+        return `<td${cls}>${esc(v)}</td>`;
+      }).join('');
+      return `<tr${isSummary ? ' class="summary-row"' : ''}>${cells}</tr>`;
+    }).join('');
+
+    document.getElementById('rowCount').textContent = rows.length + ' rows';
+  }
+
+  function setDot(state) {
+    document.getElementById('dot').className =
+      'dot' + (state === 'spin' ? ' spin' : state === 'warn' ? ' warn' : '');
+  }
+  function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
+  function esc(s) {
+    return String(s ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  loadData();
+
+  /* ── Seasonal fruit ── */
+  (function () {
+    const W = 90, H = 112;
+    const $ = (tag, a, ...kids) => {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(a||{}).forEach(([k,v]) => el.setAttribute(k,v));
+      kids.forEach(k => el.appendChild(k));
+      return el;
+    };
+    function stem(x1,y1,x2,y2){
+      return $('line',{x1,y1,x2,y2,stroke:'#6b3a1f','stroke-width':2.5,'stroke-linecap':'round'});
+    }
+    const fruits = {
+      1: { label:'草莓 Strawberry', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        [[-8,-5],[-1,-14],[8,-5],[15,0],[-15,0]].forEach(([dx,dy])=>
+          s.appendChild($('path',{d:`M45 24 Q${45+dx} ${24+dy} ${45+dx*0.6} 32`,
+            fill:'none',stroke:'#2d8a2d','stroke-width':3,'stroke-linecap':'round'})));
+        s.appendChild($('path',{d:'M45 28 Q66 32 70 60 Q68 88 45 104 Q22 88 20 60 Q24 32 45 28Z',fill:'#e8352a'}));
+        [[34,48],[45,43],[56,48],[31,62],[42,58],[53,62],[37,76],[48,72]].forEach(([x,y])=>
+          s.appendChild($('ellipse',{cx:x,cy:y,rx:2,ry:2.5,fill:'#f5e030'})));
+        s.appendChild($('path',{d:'M30 42 Q36 36 42 40',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':2.5,'stroke-linecap':'round'}));
+        return s;
+      }},
+      3: { label:'蓮霧 Wax Apple', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        s.appendChild(stem(45,4,45,18));
+        s.appendChild($('path',{d:'M45 20 Q63 22 69 52 Q73 76 64 94 Q56 108 45 110 Q34 108 26 94 Q17 76 21 52 Q27 22 45 20Z',fill:'#e8506a'}));
+        s.appendChild($('ellipse',{cx:45,cy:24,rx:9,ry:5,fill:'#c02848',opacity:.6}));
+        s.appendChild($('path',{d:'M33 107 L37 100 L41 107 L45 100 L49 107 L53 100 L57 107',fill:'none',stroke:'#c02848','stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round'}));
+        s.appendChild($('path',{d:'M29 42 Q35 34 42 38',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':2.5,'stroke-linecap':'round'}));
+        return s;
+      }},
+      4: { label:'鳳梨 Pineapple', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        const defs = $('defs',{}); const clip = $('clipPath',{id:'pc'});
+        clip.appendChild($('ellipse',{cx:45,cy:72,rx:28,ry:35})); defs.appendChild(clip); s.appendChild(defs);
+        [[45,10,43,26,'#1f6e1f',3],[45,10,47,26,'#1f6e1f',3],[45,13,37,27,'#2d8a2d',2.5],[45,13,53,27,'#2d8a2d',2.5],
+         [43,16,30,28,'#3aaa3a',2],[47,16,60,28,'#3aaa3a',2],[41,19,22,30,'#2d8a2d',1.5],[49,19,68,30,'#2d8a2d',1.5]].forEach(([x1,y1,x2,y2,c,w])=>
+          s.appendChild($('line',{x1,y1,x2,y2,stroke:c,'stroke-width':w,'stroke-linecap':'round'})));
+        s.appendChild($('ellipse',{cx:45,cy:72,rx:28,ry:35,fill:'#f5c430'}));
+        const g = $('g',{'clip-path':'url(#pc)'});
+        for(let i=-2;i<8;i++){
+          g.appendChild($('line',{x1:0,y1:37+i*14,x2:90,y2:37+i*14+90,stroke:'#c8950a','stroke-width':.9}));
+          g.appendChild($('line',{x1:0,y1:37+i*14+90,x2:90,y2:37+i*14,stroke:'#c8950a','stroke-width':.9}));
+        }
+        s.appendChild(g);
+        s.appendChild($('path',{d:'M24 58 Q30 50 36 54',fill:'none',stroke:'rgba(255,255,255,.4)','stroke-width':3,'stroke-linecap':'round'}));
+        return s;
+      }},
+      5: { label:'芒果 Mango', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        s.appendChild(stem(46,6,47,20));
+        s.appendChild($('path',{d:'M47 14 Q65 7 66 20 Q56 25 47 16',fill:'#3aaa3a'}));
+        s.appendChild($('path',{d:'M30 30 Q14 48 16 72 Q20 98 45 104 Q68 98 74 72 Q76 50 66 36 Q56 24 45 24 Q37 24 30 30Z',fill:'#f5a623'}));
+        s.appendChild($('ellipse',{cx:56,cy:44,rx:16,ry:13,fill:'#e8652a',opacity:.4}));
+        s.appendChild($('path',{d:'M33 36 Q39 30 45 34',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':2.5,'stroke-linecap':'round'}));
+        return s;
+      }},
+      6: { label:'荔枝 Lychee', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        s.appendChild(stem(45,6,45,22));
+        s.appendChild($('path',{d:'M45 14 Q62 7 63 20 Q53 24 45 16',fill:'#3aaa3a'}));
+        s.appendChild($('circle',{cx:45,cy:64,r:36,fill:'#cc2a3a'}));
+        [[28,48],[44,38],[60,46],[22,62],[38,55],[54,57],[67,63],[28,76],[44,79],[60,77]].forEach(([x,y])=>
+          s.appendChild($('circle',{cx:x,cy:y,r:5.5,fill:'#aa1828',opacity:.75})));
+        s.appendChild($('path',{d:'M28 46 Q34 40 42 44',fill:'none',stroke:'rgba(255,255,255,.4)','stroke-width':2.5,'stroke-linecap':'round'}));
+        return s;
+      }},
+      7: { label:'龍眼 Longan', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        [[[45,6],[45,28]],[[45,20],[26,38]],[[45,22],[45,40]],[[45,20],[64,38]],
+         [[26,38],[16,53]],[[26,38],[34,53]],[[64,38],[74,53]]].forEach(([[x1,y1],[x2,y2]])=>
+          s.appendChild($('line',{x1,y1,x2,y2,stroke:'#6b3a1f','stroke-width':1.8})));
+        s.appendChild($('path',{d:'M45 10 Q58 4 60 15 Q52 19 45 12',fill:'#3aaa3a'}));
+        [[16,66,14],[41,54,14],[65,64,14],[33,85,13],[59,87,13]].forEach(([cx,cy,r])=>{
+          s.appendChild($('circle',{cx,cy,r,fill:'#c8a060'}));
+          s.appendChild($('circle',{cx,cy,r:r*0.55,fill:'#8b5e2a',opacity:.4}));
+        });
+        return s;
+      }},
+      8: { label:'芭樂 Guava', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        s.appendChild(stem(45,4,45,18));
+        s.appendChild($('path',{d:'M45 10 Q62 3 63 16 Q53 20 45 12',fill:'#3aaa3a'}));
+        s.appendChild($('circle',{cx:45,cy:62,r:38,fill:'#c8d840'}));
+        s.appendChild($('ellipse',{cx:52,cy:55,rx:20,ry:18,fill:'#dce854',opacity:.55}));
+        s.appendChild($('path',{d:'M24 46 Q30 38 38 42',fill:'none',stroke:'rgba(255,255,255,.5)','stroke-width':3,'stroke-linecap':'round'}));
+        return s;
+      }},
+      9: { label:'柚子 Pomelo', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        s.appendChild(stem(45,4,45,20));
+        s.appendChild($('path',{d:'M45 10 Q62 3 63 16 Q53 20 45 12',fill:'#3aaa3a'}));
+        s.appendChild($('ellipse',{cx:45,cy:66,rx:39,ry:41,fill:'#ccd840'}));
+        s.appendChild($('ellipse',{cx:45,cy:68,rx:30,ry:32,fill:'#dce854'}));
+        s.appendChild($('path',{d:'M16 50 Q23 38 33 44',fill:'none',stroke:'rgba(255,255,255,.4)','stroke-width':4,'stroke-linecap':'round'}));
+        return s;
+      }},
+      10: { label:'柿子 Persimmon', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        s.appendChild(stem(45,8,45,22));
+        [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy])=>
+          s.appendChild($('path',{d:`M45 22 Q${45+sx*20} ${22+sy*12} ${45+sx*18} ${22+sy*18} Q45 28 ${45-sx*18} ${22+sy*18} Q${45-sx*20} ${22+sy*12} 45 22Z`,
+            fill:sx===sy?'#3aaa3a':'#2d8a2d'})));
+        s.appendChild($('circle',{cx:45,cy:70,r:38,fill:'#f57c2a'}));
+        s.appendChild($('path',{d:'M18 54 Q26 42 36 48',fill:'none',stroke:'rgba(255,255,255,.45)','stroke-width':3.5,'stroke-linecap':'round'}));
+        return s;
+      }},
+      11: { label:'釋迦 Sugar Apple', draw() {
+        const s = $('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+        s.appendChild(stem(45,5,45,20));
+        s.appendChild($('path',{d:'M45 12 Q60 5 62 17 Q52 21 45 14',fill:'#3aaa3a'}));
+        s.appendChild($('circle',{cx:45,cy:64,r:36,fill:'#7aaa50'}));
+        [[30,44],[45,38],[60,44],[22,58],[38,52],[52,52],[67,58],[26,72],[40,66],[55,66],[68,72],[32,84],[46,80],[60,84]].forEach(([x,y])=>
+          s.appendChild($('ellipse',{cx:x,cy:y,rx:9,ry:8,fill:'#6a9840',stroke:'#557830','stroke-width':.8})));
+        return s;
+      }},
+      12: null,
+    };
+    fruits[2]  = fruits[1];
+    fruits[12] = fruits[1];
+
+    const month = new Date().getMonth() + 1;
+    const entry = fruits[month] || fruits[4];
+    const wrap  = document.getElementById('seasonal-fruit');
+    wrap.appendChild(entry.draw());
+    const lbl = document.createElement('div');
+    lbl.className = 'fruit-label';
+    lbl.textContent = entry.label;
+    wrap.appendChild(lbl);
+  })();
+</script>
+</body>
+</html>
