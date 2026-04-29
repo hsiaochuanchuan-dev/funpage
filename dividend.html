@@ -174,28 +174,28 @@
 
   loadData();
 
-  /* ── Seasonal fruit emoji ── */
+  /* ── Seasonal fruit image ── */
   (function () {
     const fruits = {
-      1:  { emoji:'🍓', label:'草莓 Strawberry' },
-      2:  { emoji:'🍑', label:'水蜜桃 Peach'     },
-      3:  { emoji:'🍎', label:'蓮霧 Wax Apple'  },
-      4:  { emoji:'🍍', label:'鳳梨 Pineapple'  },
-      5:  { emoji:'🥭', label:'芒果 Mango'       },
-      6:  { emoji:'🍒', label:'荔枝 Lychee'      },
-      7:  { emoji:'🍇', label:'龍眼 Longan'      },
-      8:  { emoji:'🍐', label:'芭樂 Guava'       },
-      9:  { emoji:'🍋', label:'柚子 Pomelo'      },
-      10: { emoji:'🍊', label:'柿子 Persimmon'   },
-      11: { emoji:'🍈', label:'釋迦 Sugar Apple' },
-      12: { emoji:'🍓', label:'草莓 Strawberry'  },
+      1:  { img:'JPG/01.jpg', label:'草莓 Strawberry' },
+      2:  { img:'JPG/02.jpg', label:'水蜜桃 Peach'    },
+      3:  { img:'JPG/03.jpg', label:'蓮霧 Wax Apple'  },
+      4:  { img:'JPG/04.jpg', label:'鳳梨 Pineapple'  },
+      5:  { img:'JPG/05.jpg', label:'芒果 Mango'       },
+      6:  { img:'JPG/06.jpg', label:'荔枝 Lychee'      },
+      7:  { img:'JPG/07.jpg', label:'龍眼 Longan'      },
+      8:  { img:'JPG/08.jpg', label:'芭樂 Guava'       },
+      9:  { img:'JPG/09.jpg', label:'柚子 Pomelo'      },
+      10: { img:'JPG/10.jpg', label:'柿子 Persimmon'   },
+      11: { img:'JPG/11.jpg', label:'釋迦 Sugar Apple' },
+      12: { img:'JPG/12.jpg', label:'草莓 Strawberry'  },
     };
     const entry = fruits[new Date().getMonth() + 1];
     const wrap  = document.getElementById('seasonal-fruit');
-    const icon  = document.createElement('div');
-    icon.style.cssText = 'font-size:72px; line-height:1;';
-    icon.textContent   = entry.emoji;
-    wrap.appendChild(icon);
+    const img   = document.createElement('img');
+    img.src     = entry.img;
+    img.style.cssText = 'width:90px; height:90px; object-fit:cover; border-radius:50%; display:block;';
+    wrap.appendChild(img);
     const lbl = document.createElement('div');
     lbl.className   = 'fruit-label';
     lbl.textContent = entry.label;
