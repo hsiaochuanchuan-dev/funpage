@@ -65,9 +65,10 @@
       position: fixed; bottom: 18px; left: 18px;
       z-index: 999; pointer-events: none;
       animation: fruit-bob 2.8s ease-in-out infinite;
+      text-align: center;
     }
     #seasonal-fruit .fruit-label {
-      text-align: center; font-size: 11px; color: #5f6368;
+      font-size: 11px; color: #5f6368;
       margin-top: 4px; font-weight: 600; letter-spacing: .3px;
     }
     @keyframes fruit-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
@@ -138,11 +139,11 @@
   }
 
   function renderTable(data) {
-    const cols     = data[0];
-    const rows     = data.slice(1);
-    const prodIdx  = cols.findIndex(c => /product/i.test(c));
+    const cols      = data[0];
+    const rows      = data.slice(1);
+    const prodIdx   = cols.findIndex(c => /product/i.test(c));
     const postedIdx = cols.findIndex(c => /已過帳/.test(c));
-    const SUMMARY  = ['TWD', 'Deposit', 'Available'];
+    const SUMMARY   = ['TWD', 'Deposit', 'Available'];
 
     document.getElementById('thead').innerHTML =
       '<tr>' + cols.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
@@ -173,291 +174,30 @@
 
   loadData();
 
-  /* ── Seasonal fruit ── */
+  /* ── Seasonal fruit emoji ── */
   (function () {
-    const W = 100, H = 130;
-    const SVG_NS = 'http://www.w3.org/2000/svg';
-
-    function el(tag, attrs, ...kids) {
-      const e = document.createElementNS(SVG_NS, tag);
-      Object.entries(attrs || {}).forEach(([k, v]) => e.setAttribute(k, v));
-      kids.forEach(k => k && e.appendChild(k));
-      return e;
-    }
-
-    function svg() { return el('svg', {width:W, height:H, viewBox:`0 0 ${W} ${H}`}); }
-
-    function rg(id, cx, cy, r, stops) {
-      const g = el('radialGradient', {id, cx, cy, r, gradientUnits:'userSpaceOnUse'});
-      stops.forEach(([off, col, op]) =>
-        g.appendChild(el('stop', {'offset':off,'stop-color':col,'stop-opacity':op ?? 1})));
-      return g;
-    }
-
-    function lg(id, x1, y1, x2, y2, stops) {
-      const g = el('linearGradient', {id, x1, y1, x2, y2, gradientUnits:'userSpaceOnUse'});
-      stops.forEach(([off, col, op]) =>
-        g.appendChild(el('stop', {'offset':off,'stop-color':col,'stop-opacity':op ?? 1})));
-      return g;
-    }
-
-    function shine(cx, cy, rx, ry, rot) {
-      return el('ellipse', {cx, cy, rx, ry,
-        transform: rot ? `rotate(${rot},${cx},${cy})` : '',
-        fill:'white', opacity:.28});
-    }
-
     const fruits = {
-
-      /* ── Jan / Feb / Dec : Strawberry ── */
-      1: { label:'草莓 Strawberry', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('sg','42','68','44', [['0','#ff6060'],['0.5','#e8202a'],['1','#a01020']]));
-        defs.appendChild(rg('lg','40','30','12', [['0','#55cc44'],['1','#226611']]));
-        s.appendChild(defs);
-        // calyx leaves
-        [  ['M50 36 Q56 14 62 18 Q58 30 50 36Z','#4caf50'],
-           ['M50 36 Q68 22 70 30 Q62 36 50 36Z','#388e3c'],
-           ['M50 36 Q44 14 38 18 Q42 30 50 36Z','#4caf50'],
-           ['M50 36 Q32 22 30 30 Q38 36 50 36Z','#388e3c'],
-           ['M50 36 Q50 12 54 16 Q52 28 50 36Z','#66bb6a'],
-        ].forEach(([d,fill]) => s.appendChild(el('path',{d,fill})));
-        // stem
-        s.appendChild(el('line',{x1:50,y1:14,x2:52,y2:4,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
-        // body — heart-like strawberry shape
-        s.appendChild(el('path',{d:'M50 40 Q72 42 75 68 Q73 96 50 118 Q27 96 25 68 Q28 42 50 40Z', fill:'url(#sg)'}));
-        // seeds
-        [[38,56],[50,50],[62,56],[34,70],[46,65],[58,67],[70,70],[36,84],[50,80],[63,82],[40,97],[54,94]].forEach(([x,y])=>
-          s.appendChild(el('ellipse',{cx:x,cy:y,rx:2.2,ry:2.8,fill:'#f5e642',stroke:'#c8b800','stroke-width':.4})));
-        // shine
-        s.appendChild(shine(38,54,8,5,-30));
-        return s;
-      }},
-
-      /* ── Mar : Wax Apple 蓮霧 ── */
-      3: { label:'蓮霧 Wax Apple', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('wg','42','65','40', [['0','#ff8fa8'],['0.45','#e8355a'],['1','#8b0a2a']]));
-        defs.appendChild(lg('stemg','50','0','50','20', [['0','#5d4037'],['1','#8d6e63']]));
-        s.appendChild(defs);
-        s.appendChild(el('line',{x1:50,y1:2,x2:50,y2:20,stroke:'url(#stemg)','stroke-width':3,'stroke-linecap':'round'}));
-        // leaf
-        s.appendChild(el('path',{d:'M50 10 Q68 2 70 14 Q60 20 50 12Z', fill:'#43a047'}));
-        s.appendChild(el('path',{d:'M50 10 Q34 4 32 14 Q42 18 50 12Z', fill:'#388e3c'}));
-        // bell body
-        s.appendChild(el('path',{d:'M50 22 Q70 24 76 58 Q80 84 70 104 Q62 120 50 122 Q38 120 30 104 Q20 84 24 58 Q30 24 50 22Z', fill:'url(#wg)'}));
-        // dimple top
-        s.appendChild(el('ellipse',{cx:50,cy:26,rx:10,ry:6,fill:'#9b1030',opacity:.5}));
-        // crown petals at bottom
-        s.appendChild(el('path',{d:'M36 116 Q40 108 44 116 Q48 108 52 116 Q56 108 60 116 Q64 108 68 116',
-          fill:'none',stroke:'#9b1030','stroke-width':2.2,'stroke-linecap':'round','stroke-linejoin':'round'}));
-        s.appendChild(shine(38,48,9,6,-25));
-        return s;
-      }},
-
-      /* ── Apr : Pineapple 鳳梨 ── */
-      4: { label:'鳳梨 Pineapple', draw() {
-        const s = svg();
-        const defs = el('defs');
-        const clip = el('clipPath',{id:'pc2'});
-        clip.appendChild(el('ellipse',{cx:50,cy:82,rx:32,ry:40}));
-        defs.appendChild(clip);
-        defs.appendChild(rg('pg','40','68','38', [['0','#ffe066'],['0.5','#f5c430'],['1','#b8760a']]));
-        s.appendChild(defs);
-        // crown leaves — layered for depth
-        const crownLeaves = [
-          {d:'M50 44 Q38 10 34 4 Q40 12 50 44Z', f:'#1b5e20'},
-          {d:'M50 44 Q62 10 66 4 Q60 12 50 44Z', f:'#1b5e20'},
-          {d:'M50 42 Q42 14 36 10 Q43 18 50 42Z', f:'#2e7d32'},
-          {d:'M50 42 Q58 14 64 10 Q57 18 50 42Z', f:'#2e7d32'},
-          {d:'M50 40 Q46 18 42 16 Q47 22 50 40Z', f:'#388e3c'},
-          {d:'M50 40 Q54 18 58 16 Q53 22 50 40Z', f:'#388e3c'},
-          {d:'M50 38 Q50 16 50 12 Q52 22 50 38Z', f:'#43a047'},
-          {d:'M50 40 Q32 22 26 20 Q34 26 50 40Z', f:'#2e7d32'},
-          {d:'M50 40 Q68 22 74 20 Q66 26 50 40Z', f:'#2e7d32'},
-        ];
-        crownLeaves.forEach(({d,f}) => s.appendChild(el('path',{d,fill:f})));
-        // body
-        s.appendChild(el('ellipse',{cx:50,cy:82,rx:32,ry:40,fill:'url(#pg)'}));
-        // scale grid clipped
-        const g = el('g',{'clip-path':'url(#pc2)'});
-        for(let i=-4;i<10;i++){
-          g.appendChild(el('line',{x1:-10,y1:42+i*13,x2:110,y2:42+i*13+120,stroke:'#9a6500','stroke-width':1}));
-          g.appendChild(el('line',{x1:-10,y1:42+i*13+120,x2:110,y2:42+i*13,stroke:'#9a6500','stroke-width':1}));
-        }
-        // scale dots at intersections for realism
-        for(let i=0;i<6;i++) for(let j=0;j<5;j++)
-          g.appendChild(el('circle',{cx:22+j*16,cy:50+i*13+(j%2)*6.5,r:2,fill:'#7a4f00',opacity:.4}));
-        s.appendChild(g);
-        // highlight
-        s.appendChild(shine(38,64,10,7,-20));
-        return s;
-      }},
-
-      /* ── May : Mango 芒果 ── */
-      5: { label:'芒果 Mango', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('mg','44','72','46', [['0','#ffe066'],['0.4','#f5a623'],['0.8','#e85d20'],['1','#8b3a00']]));
-        defs.appendChild(lg('blushlg','58','40','82','70', [['0','#e8352a'],['1','#e8352a',0]]));
-        s.appendChild(defs);
-        // stem
-        s.appendChild(el('line',{x1:52,y1:10,x2:54,y2:2,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
-        // leaf
-        s.appendChild(el('path',{d:'M52 8 Q72 0 74 12 Q64 18 52 10Z',fill:'#43a047'}));
-        s.appendChild(el('path',{d:'M52 8 L63 6',fill:'none',stroke:'#2e7d32','stroke-width':.8}));
-        // body — kidney/oval mango shape
-        s.appendChild(el('path',{d:'M52 18 Q30 22 22 52 Q16 80 28 104 Q38 120 52 122 Q68 120 78 106 Q90 88 86 62 Q82 38 68 26 Q62 18 52 18Z', fill:'url(#mg)'}));
-        // red blush
-        s.appendChild(el('path',{d:'M52 18 Q30 22 22 52 Q16 80 28 104 Q38 120 52 122 Q68 120 78 106 Q90 88 86 62 Q82 38 68 26 Q62 18 52 18Z', fill:'url(#blushlg)',opacity:.45}));
-        // shine
-        s.appendChild(shine(36,42,10,6,-30));
-        return s;
-      }},
-
-      /* ── Jun : Lychee 荔枝 ── */
-      6: { label:'荔枝 Lychee', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('lyg','42','62','42', [['0','#ff6680'],['0.5','#cc1a30'],['1','#6b0010']]));
-        s.appendChild(defs);
-        s.appendChild(el('line',{x1:50,y1:8,x2:50,y2:24,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
-        s.appendChild(el('path',{d:'M50 14 Q66 6 68 18 Q58 24 50 16Z',fill:'#43a047'}));
-        // body
-        s.appendChild(el('circle',{cx:50,cy:72,r:42,fill:'url(#lyg)'}));
-        // bumpy skin texture
-        [[32,52],[50,44],[68,52],[24,68],[40,62],[58,62],[74,68],
-         [28,84],[44,78],[62,80],[76,84],[34,96],[52,92],[68,96]].forEach(([x,y])=>{
-          s.appendChild(el('circle',{cx:x,cy:y,r:7,fill:'none',stroke:'#8b001a','stroke-width':1.2,opacity:.6}));
-          s.appendChild(el('circle',{cx:x,cy:y,r:3.5,fill:'#a01a28',opacity:.5}));
-        });
-        s.appendChild(shine(36,52,11,7,-25));
-        return s;
-      }},
-
-      /* ── Jul : Longan 龍眼 ── */
-      7: { label:'龍眼 Longan', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('long1','18','72','15',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
-        defs.appendChild(rg('long2','44','58','15',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
-        defs.appendChild(rg('long3','70','70','15',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
-        defs.appendChild(rg('long4','36','92','13',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
-        defs.appendChild(rg('long5','62','94','13',[['0','#e8c880'],['0.6','#c8a040'],['1','#8b6418']]));
-        s.appendChild(defs);
-        // branch stems
-        [ [50,4,50,30],[50,22,28,42],[50,22,50,44],[50,22,72,42],
-          [28,42,18,58],[28,42,36,58],[72,42,76,58] ].forEach(([x1,y1,x2,y2])=>
-          s.appendChild(el('line',{x1,y1,x2,y2,stroke:'#6d4c41','stroke-width':2,'stroke-linecap':'round'})));
-        // leaf at top
-        s.appendChild(el('path',{d:'M50 8 Q62 2 64 12 Q56 18 50 10Z',fill:'#43a047'}));
-        // fruit clusters
-        [[18,72,15,'long1'],[44,58,15,'long2'],[70,70,15,'long3'],[36,92,13,'long4'],[62,94,13,'long5']].forEach(([cx,cy,r,gid])=>{
-          s.appendChild(el('circle',{cx,cy,r,fill:`url(#${gid})`}));
-          // eye mark
-          s.appendChild(el('circle',{cx,cy,r:r*.45,fill:'#5d3a10',opacity:.35}));
-          s.appendChild(el('ellipse',{cx:cx-r*.25,cy:cy-r*.25,rx:r*.22,ry:r*.15,fill:'white',opacity:.35}));
-        });
-        return s;
-      }},
-
-      /* ── Aug : Guava 芭樂 ── */
-      8: { label:'芭樂 Guava', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('gg','42','66','44',[['0','#ddf066'],['0.5','#a8c820'],['1','#5a7800']]));
-        s.appendChild(defs);
-        s.appendChild(el('line',{x1:50,y1:6,x2:50,y2:20,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
-        s.appendChild(el('path',{d:'M50 12 Q66 4 68 16 Q58 22 50 14Z',fill:'#43a047'}));
-        // body
-        s.appendChild(el('circle',{cx:50,cy:72,r:44,fill:'url(#gg)'}));
-        // lighter patch
-        s.appendChild(el('ellipse',{cx:58,cy:62,rx:22,ry:18,fill:'#c8e040',opacity:.5}));
-        // flower-end star at bottom
-        const starPts = [0,1,2,3,4].map(i=>{
-          const a1 = (i*72-90)*Math.PI/180, a2 = ((i*72+36)-90)*Math.PI/180;
-          return `L${(50+11*Math.cos(a1)).toFixed(1)} ${(108+11*Math.sin(a1)).toFixed(1)} L${(50+6*Math.cos(a2)).toFixed(1)} ${(108+6*Math.sin(a2)).toFixed(1)}`;
-        }).join(' ');
-        s.appendChild(el('path',{d:'M50 108 '+starPts+'Z',fill:'#7a9a10'}));
-        s.appendChild(el('circle',{cx:50,cy:108,r:5,fill:'#ffccdd',opacity:.8}));
-        s.appendChild(shine(36,52,11,7,-25));
-        return s;
-      }},
-
-      /* ── Sep : Pomelo 柚子 ── */
-      9: { label:'柚子 Pomelo', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('pog','42','72','50',[['0','#f5f080'],['0.5','#d4d820'],['1','#8a9000']]));
-        defs.appendChild(rg('peelg','42','72','50',[['0','#f5f080',0],['0.75','#d4d820',0],['0.85','#b8c010',.6],['1','#8a9000',.8]]));
-        s.appendChild(defs);
-        s.appendChild(el('line',{x1:50,y1:4,x2:50,y2:18,stroke:'#5d4037','stroke-width':3,'stroke-linecap':'round'}));
-        s.appendChild(el('path',{d:'M50 10 Q68 2 70 14 Q60 20 50 12Z',fill:'#43a047'}));
-        // outer peel (thick)
-        s.appendChild(el('ellipse',{cx:50,cy:76,rx:44,ry:46,fill:'url(#pog)'}));
-        // inner fruit visible as lighter center
-        s.appendChild(el('ellipse',{cx:50,cy:76,rx:34,ry:36,fill:'#eef060',opacity:.6}));
-        // peel ring
-        s.appendChild(el('ellipse',{cx:50,cy:76,rx:44,ry:46,fill:'none',stroke:'#a0a800','stroke-width':3,opacity:.4}));
-        // navel top
-        s.appendChild(el('ellipse',{cx:50,cy:30,rx:11,ry:8,fill:'#c8ca10',opacity:.5}));
-        s.appendChild(shine(34,56,14,8,-20));
-        return s;
-      }},
-
-      /* ── Oct : Persimmon 柿子 ── */
-      10: { label:'柿子 Persimmon', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('prg','40','68','46',[['0','#ffcc44'],['0.4','#f57c2a'],['0.85','#c84010'],['1','#7a2000']]));
-        s.appendChild(defs);
-        s.appendChild(el('line',{x1:50,y1:8,x2:52,y2:2,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
-        // 4-leaf calyx
-        [  ['M50 24 Q34 14 30 24 Q38 32 50 26Z','#4caf50'],
-           ['M50 24 Q66 14 70 24 Q62 32 50 26Z','#388e3c'],
-           ['M50 24 Q36 36 38 46 Q46 38 50 26Z','#4caf50'],
-           ['M50 24 Q64 36 62 46 Q54 38 50 26Z','#388e3c'],
-        ].forEach(([d,f])=>s.appendChild(el('path',{d,fill:f})));
-        // body — round slightly flattened
-        s.appendChild(el('ellipse',{cx:50,cy:78,rx:40,ry:44,fill:'url(#prg)'}));
-        // subtle vertical ribs
-        [[-20,0],[20,0],[0,-18],[0,18]].forEach(([dx,dy])=>
-          s.appendChild(el('path',{d:`M50 34 Q${50+dx} ${56+dy} ${50+dx*.4} 120`,fill:'none',stroke:'#c84010','stroke-width':1.2,opacity:.3})));
-        s.appendChild(shine(36,52,12,7,-25));
-        return s;
-      }},
-
-      /* ── Nov : Sugar Apple 釋迦 ── */
-      11: { label:'釋迦 Sugar Apple', draw() {
-        const s = svg();
-        const defs = el('defs');
-        defs.appendChild(rg('sag','40','68','46',[['0','#a0d060'],['0.6','#6a9838'],['1','#2e5010']]));
-        s.appendChild(defs);
-        s.appendChild(el('line',{x1:50,y1:6,x2:50,y2:20,stroke:'#5d4037','stroke-width':2.5,'stroke-linecap':'round'}));
-        s.appendChild(el('path',{d:'M50 12 Q66 4 68 16 Q58 22 50 14Z',fill:'#2e7d32'}));
-        // base body
-        s.appendChild(el('circle',{cx:50,cy:74,r:42,fill:'url(#sag)'}));
-        // bumpy scale segments
-        [[32,50],[50,44],[68,50],[22,64],[38,58],[58,58],[74,64],
-         [26,78],[42,72],[60,74],[76,78],[30,92],[48,88],[66,90],[78,94]].forEach(([x,y])=>{
-          s.appendChild(el('ellipse',{cx:x,cy:y,rx:11,ry:9,fill:'#7ab840',stroke:'#3a6820','stroke-width':1.2}));
-          s.appendChild(el('ellipse',{cx:x,cy:y,rx:7,ry:5.5,fill:'#90cc50',opacity:.5}));
-        });
-        s.appendChild(shine(34,52,12,7,-20));
-        return s;
-      }},
+      1:  { emoji:'🍓', label:'草莓 Strawberry' },
+      2:  { emoji:'🍓', label:'草莓 Strawberry' },
+      3:  { emoji:'🍎', label:'蓮霧 Wax Apple'  },
+      4:  { emoji:'🍍', label:'鳳梨 Pineapple'  },
+      5:  { emoji:'🥭', label:'芒果 Mango'       },
+      6:  { emoji:'🍒', label:'荔枝 Lychee'      },
+      7:  { emoji:'🍇', label:'龍眼 Longan'      },
+      8:  { emoji:'🍐', label:'芭樂 Guava'       },
+      9:  { emoji:'🍋', label:'柚子 Pomelo'      },
+      10: { emoji:'🍊', label:'柿子 Persimmon'   },
+      11: { emoji:'🍈', label:'釋迦 Sugar Apple' },
+      12: { emoji:'🍓', label:'草莓 Strawberry'  },
     };
-    fruits[2]  = fruits[1];
-    fruits[12] = fruits[1];
-
-    const month = new Date().getMonth() + 1;
-    const entry = fruits[month] || fruits[4];
+    const entry = fruits[new Date().getMonth() + 1];
     const wrap  = document.getElementById('seasonal-fruit');
-    wrap.appendChild(entry.draw());
+    const icon  = document.createElement('div');
+    icon.style.cssText = 'font-size:72px; line-height:1;';
+    icon.textContent   = entry.emoji;
+    wrap.appendChild(icon);
     const lbl = document.createElement('div');
-    lbl.className = 'fruit-label';
+    lbl.className   = 'fruit-label';
     lbl.textContent = entry.label;
     wrap.appendChild(lbl);
   })();
