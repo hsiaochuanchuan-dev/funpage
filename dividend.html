@@ -77,7 +77,7 @@
 
 <header>
   <h1>Grace — Dividend Tracker</h1>
-  <sub>OtherNote.xlsx › dividend &nbsp;|&nbsp; A1:G9 &nbsp;|&nbsp; Read-only</sub>
+  <sub>OtherNote.xlsx › dividend &nbsp;|&nbsp; A1:G10 &nbsp;|&nbsp; Read-only</sub>
 </header>
 
 <div class="statusbar">
@@ -106,7 +106,7 @@
 <script>
   const API_KEY        = 'AIzaSyCQjHQbMlSYHLWWFNhqCwy4u3zisCyknqo';
   const SPREADSHEET_ID = '1pljY-of-ICBP8WQVgg8l5ICSpL3F6rMs3B8XJXdP2t4';
-  const RANGE          = 'dividend!A1:G9';
+  const RANGE          = 'dividend!A1:G10';
 
   const SEED = [
     ['Institution', 'Product', 'Funding', 'Monthly Average', 'ROI%', 'Frequency', '已過帳'],
@@ -127,12 +127,12 @@
       const res  = await fetch(url);
       const json = await res.json();
       if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
-      const vals = (json.values || []).slice(0, 9);
+      const vals = (json.values || []).slice(0, 10);
       if (!vals.length) throw new Error('Sheet returned no data');
       renderTable(vals);
       setDot('ok'); setStatus(`${vals.length - 1} rows loaded from Google Sheets`);
     } catch (err) {
-      renderTable(SEED.slice(0, 9));
+      renderTable(SEED.slice(0, 10));
       setDot('warn'); setStatus(`Showing cached data (${err.message})`);
     }
   }

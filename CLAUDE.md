@@ -2,7 +2,7 @@
 
 ## Data Source
 
-- **File:** [OtherNote.xlsx](https://docs.google.com/spreadsheets/d/1JgVO35PwZYDHnzjR22-SgTx6PvrXpAkV/edit?usp=drive_link&ouid=114683586849184240044&rtpof=true&sd=true)
+- **File:** [OtherNote (Google Sheets)](https://docs.google.com/spreadsheets/d/1pljY-of-ICBP8WQVgg8l5ICSpL3F6rMs3B8XJXdP2t4/edit)
 - **Sheet:** `dividend`
-- **Range:** `A1:G9`
+- **Range:** `A1:G10`
 - **Access:** Read-only — do not write back to the spreadsheet
