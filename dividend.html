@@ -78,7 +78,7 @@
 
 <header>
   <h1>Grace — Dividend Tracker</h1>
-  <sub>OtherNote.xlsx › dividend &nbsp;|&nbsp; A1:G10 &nbsp;|&nbsp; Read-only</sub>
+  <sub>OtherNote.xlsx › dividend &nbsp;|&nbsp; A1:I10 &nbsp;|&nbsp; Read-only</sub>
 </header>
 
 <div class="statusbar">
@@ -107,7 +107,7 @@
 <script>
   const API_KEY        = 'AIzaSyCQjHQbMlSYHLWWFNhqCwy4u3zisCyknqo';
   const SPREADSHEET_ID = '1pljY-of-ICBP8WQVgg8l5ICSpL3F6rMs3B8XJXdP2t4';
-  const RANGE          = 'dividend!A1:G10';
+  const RANGE          = 'dividend!A1:I10';
 
   const SEED = [
     ['Institution', 'Product', 'Funding', 'Monthly Average', 'ROI%', 'Frequency', '已過帳'],
@@ -194,7 +194,7 @@
     const wrap  = document.getElementById('seasonal-fruit');
     const img   = document.createElement('img');
     img.src     = entry.img;
-    img.style.cssText = 'width:180px; height:180px; object-fit:cover; border-radius:50%; display:block;';
+    img.style.cssText = 'width:90px; height:90px; object-fit:cover; border-radius:50%; display:block;';
     wrap.appendChild(img);
     const lbl = document.createElement('div');
     lbl.className   = 'fruit-label';
