@@ -4,75 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grace — Dividend</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', -apple-system, sans-serif;
-      background: #f0f2f5; min-height: 100vh;
-      display: flex; flex-direction: column;
-    }
-    header {
-      background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-      color: white; padding: 16px 24px; flex-shrink: 0;
-    }
-    header h1  { font-size: 20px; font-weight: 500; }
-    header sub { font-size: 12px; opacity: .85; display: block; margin-top: 2px; }
-    .statusbar {
-      background: white; border-bottom: 1px solid #e0e0e0;
-      padding: 7px 24px; display: flex; align-items: center;
-      gap: 10px; font-size: 13px; color: #5f6368; flex-shrink: 0;
-    }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #34a853; }
-    .dot.spin { background: #fbbc04; animation: blink 1s infinite; }
-    .dot.warn { background: #ff9800; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-    main { flex: 1; padding: 20px 24px; overflow: auto; }
-    .card {
-      background: white; border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden;
-    }
-    .card-head {
-      padding: 13px 20px; border-bottom: 2px solid #1a73e8;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .card-head h2 { font-size: 14px; font-weight: 700; color: #202124; text-transform: uppercase; letter-spacing: .4px; }
-    .card-head span { font-size: 12px; color: #5f6368; }
-    .tbl-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    thead tr { background: #e8f0fe; }
-    th {
-      padding: 10px 12px; text-align: left;
-      font-size: 12px; font-weight: 700; color: #1a73e8;
-      white-space: nowrap; border-right: 1px solid #c5d8fb;
-    }
-    th:last-child { border-right: none; }
-    td {
-      padding: 9px 12px; font-size: 14px; color: #202124;
-      border-bottom: 1px solid #e8eaed; border-right: 1px solid #e8eaed;
-      white-space: nowrap;
-    }
-    td:last-child { border-right: none; }
-    tr:nth-child(even) td { background: #fafafa; }
-    tr:hover td { background: #f1f8fe; }
-    tr.summary-row td { background: #fce4ec; color: #880e4f; font-weight: 600; }
-    tr.summary-row:hover td { background: #f8bbd0; }
-    td.posted { color: #388e3c; font-weight: 600; font-size: 12px; }
-    footer {
-      background: white; border-top: 1px solid #e0e0e0;
-      padding: 10px 24px; font-size: 12px; color: #9aa0a6; flex-shrink: 0;
-    }
-    #seasonal-fruit {
-      position: fixed; bottom: 18px; left: 18px;
-      z-index: 999; pointer-events: none;
-      animation: fruit-bob 2.8s ease-in-out infinite;
-      text-align: center;
-    }
-    #seasonal-fruit .fruit-label {
-      font-size: 11px; color: #5f6368;
-      margin-top: 4px; font-weight: 600; letter-spacing: .3px;
-    }
-    @keyframes fruit-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
