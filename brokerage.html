@@ -44,14 +44,18 @@
     setDot('spin'); setStatus('Loading data from Google Sheets…');
     try {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
+      console.log('Fetching:', url);
       const res  = await fetch(url);
       const json = await res.json();
+      console.log('Response:', json);
       if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
       const vals = json.values || [];
+      console.log('Raw values:', vals);
       if (!vals.length) throw new Error('Sheet returned no data');
       const queryDate = vals[0]?.[0] ?? '';
       const stockData = vals.slice(2).filter(r => r && r[0]);
-      if (!stockData.length) throw new Error('No stock data found');
+      console.log('Query date:', queryDate, 'Stock data rows:', stockData.length);
+      if (!stockData.length) throw new Error('No stock data found in rows 3+');
       renderTable(queryDate, stockData);
       setDot('ok'); setStatus(`Updated: ${queryDate} • ${stockData.length} stocks`);
     } catch (err) {
