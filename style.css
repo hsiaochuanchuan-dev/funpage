@@ -64,13 +64,13 @@ main { flex: 1; padding: 20px 24px; overflow: auto; }
 }
 .card-head h2 { font-size: 14px; font-weight: 700; color: #202124; text-transform: uppercase; letter-spacing: .4px; }
 .card-head span { font-size: 12px; color: #5f6368; }
-.tbl-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
+.tbl-wrap { overflow-x: auto; width: 100%; }
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
 thead tr { background: #e8f0fe; }
 th {
   padding: 10px 12px; text-align: left;
   font-size: 12px; font-weight: 700; color: #1a73e8;
-  white-space: nowrap; border-right: 1px solid #c5d8fb;
+  border-right: 1px solid #c5d8fb; min-width: 100px;
 }
 th:last-child { border-right: none; }
 td {

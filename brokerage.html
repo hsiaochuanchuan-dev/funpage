@@ -67,10 +67,14 @@
   }
 
   function renderTable(headers, rows) {
-    document.getElementById('thead').innerHTML =
-      '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+    console.log('Rendering table with', headers.length, 'columns');
+    const headerHtml = '<tr>' + headers.map((h, i) => {
+      console.log('Column', i, ':', h);
+      return `<th>${esc(h)}</th>`;
+    }).join('') + '</tr>';
+    document.getElementById('thead').innerHTML = headerHtml;
 
-    const rowsHtml = rows.map(row => {
+    const rowsHtml = rows.map((row, rowIdx) => {
       const cells = headers.map((_, i) => {
         const v = row[i] ?? '';
         return `<td>${esc(v)}</td>`;
@@ -79,7 +83,8 @@
     }).join('');
 
     document.getElementById('tbody').innerHTML = rowsHtml || '<tr><td colspan="5" style="text-align:center; color:#999;">No data available</td></tr>';
-    document.getElementById('rowCount').textContent = rows.length ? `${rows.length} rows` : 'No data';
+    console.log('Table rendered with', rows.length, 'rows and', headers.length, 'columns');
+    document.getElementById('rowCount').textContent = rows.length ? `${rows.length} rows × ${headers.length} columns` : 'No data';
   }
 
   function setDot(s) {
