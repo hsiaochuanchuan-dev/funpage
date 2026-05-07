@@ -9,32 +9,87 @@
 <body>
 <header>
   <h1>Brokerage Ranking</h1>
-  <sub>Data source: OtherNote › brokerage (A1:E12)</sub>
+  <sub>OtherNote › brokerage (B1:E12) | Day trading top 10 stocks</sub>
 </header>
 <div class="statusbar">
-  <span class="dot"></span>
-  <span>Last updated: 2026/05/07 22:40</span>
+  <div class="dot" id="dot"></div>
+  <span id="statusMsg">Loading…</span>
 </div>
 <main>
   <div class="card">
     <div class="card-head">
       <h2>Brokerage Ranking</h2>
-      <span>Google Sheets range A1:E12</span>
+      <span id="rowCount"></span>
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr><th>Code</th><th>Name</th><th>Reason</th><th>Action</th><th>Notes</th></tr>
-        </thead>
-        <tbody>
-<tr><td colspan="5" style="text-align:center; padding: 24px;">No data available. Verify your Google Sheet and run <code>python generate_brokerage.py</code>.</td></tr>
-        </tbody>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
       </table>
     </div>
   </div>
 </main>
-<footer>
-  Published as a GitHub Pages page at <code>https://hsiaochuanchuan-dev.github.io/brokerage</code> when deployed from the repository root.
-</footer>
+<footer>Data source: Google Sheets › brokerage (read-only)</footer>
+
+<script>
+  const API_KEY        = 'AIzaSyCQjHQbMlSYHLWWFNhqCwy4u3zisCyknqo';
+  const SPREADSHEET_ID = '1pljY-of-ICBP8WQVgg8l5ICSpL3F6rMs3B8XJXdP2t4';
+  const RANGE          = 'brokerage!B1:E12';
+
+  const SEED = [
+    ['Date', 'Code', 'Name', 'Reason'],
+  ];
+
+  async function loadData() {
+    setDot('spin'); setStatus('Loading data from Google Sheets…');
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
+      console.log('Fetching:', url);
+      const res  = await fetch(url);
+      const json = await res.json();
+      console.log('Response:', json);
+      if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
+      const vals = json.values || [];
+      console.log('Raw values:', vals);
+      if (!vals.length) throw new Error('Sheet returned no data');
+      const queryDate = vals[0]?.[0] ?? '';
+      const stockData = vals.slice(2).filter(r => r && r[0]);
+      console.log('Query date:', queryDate, 'Stock data rows:', stockData.length);
+      if (!stockData.length) throw new Error('No stock data found in rows 3+');
+      renderTable(queryDate, stockData);
+      setDot('ok'); setStatus(`Updated: ${queryDate} • ${stockData.length} stocks`);
+    } catch (err) {
+      console.error('Error:', err.message);
+      renderTable('', []);
+      setDot('warn'); setStatus(`Error: ${err.message}`);
+    }
+  }
+
+  function renderTable(queryDate, stockData) {
+    const headers = ['Code', 'Name', 'Reason', 'Action'];
+    document.getElementById('thead').innerHTML =
+      '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+
+    const rows = stockData.map(stock => {
+      const cells = stock.slice(0, 4).map(v => `<td>${esc(v)}</td>`).join('');
+      return `<tr>${cells}</tr>`;
+    }).join('');
+
+    document.getElementById('tbody').innerHTML = rows || '<tr><td colspan="4" style="text-align:center; color:#999;">No data available</td></tr>';
+    document.getElementById('rowCount').textContent = queryDate ? `${stockData.length} stocks (${queryDate})` : 'No data';
+  }
+
+  function setDot(s) {
+    document.getElementById('dot').className =
+      'dot' + (s === 'spin' ? ' spin' : s === 'warn' ? ' warn' : '');
+  }
+  function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
+  function esc(s) {
+    return String(s ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  loadData();
+</script>
 </body>
 </html>
