@@ -9,7 +9,7 @@
 <body>
 <header>
   <h1>Brokerage Ranking</h1>
-  <sub>OtherNote › brokerage (B1:E12) | Day trading top 10 stocks</sub>
+  <sub>OtherNote › brokerage (A1:E12) | Day trading top 10 stocks</sub>
 </header>
 <div class="statusbar">
   <div class="dot" id="dot"></div>
@@ -34,7 +34,7 @@
 <script>
   const API_KEY        = 'AIzaSyCQjHQbMlSYHLWWFNhqCwy4u3zisCyknqo';
   const SPREADSHEET_ID = '1pljY-of-ICBP8WQVgg8l5ICSpL3F6rMs3B8XJXdP2t4';
-  const RANGE          = 'brokerage!B1:E12';
+  const RANGE          = 'brokerage!A1:E12';
 
   const SEED = [
     ['Date', 'Code', 'Name', 'Reason'],
@@ -52,31 +52,33 @@
       const vals = json.values || [];
       console.log('Raw values:', vals);
       if (!vals.length) throw new Error('Sheet returned no data');
-      const queryDate = vals[0]?.[0] ?? '';
-      const stockData = vals.slice(2).filter(r => r && r[0]);
-      console.log('Query date:', queryDate, 'Stock data rows:', stockData.length);
-      if (!stockData.length) throw new Error('No stock data found in rows 3+');
-      renderTable(queryDate, stockData);
-      setDot('ok'); setStatus(`Updated: ${queryDate} • ${stockData.length} stocks`);
+      const headers = vals[0] || [];
+      const rows = vals.slice(1).filter(r => r && r.some(v => v));
+      console.log('Headers:', headers, 'Data rows:', rows.length);
+      if (!rows.length) throw new Error('No data rows found');
+      renderTable(headers, rows);
+      setDot('ok'); setStatus(`${rows.length} rows loaded`);
     } catch (err) {
       console.error('Error:', err.message);
-      renderTable('', []);
+      renderTable([], []);
       setDot('warn'); setStatus(`Error: ${err.message}`);
     }
   }
 
-  function renderTable(queryDate, stockData) {
-    const headers = ['Code', 'Name', 'Reason', 'Action'];
+  function renderTable(headers, rows) {
     document.getElementById('thead').innerHTML =
       '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
 
-    const rows = stockData.map(stock => {
-      const cells = stock.slice(0, 4).map(v => `<td>${esc(v)}</td>`).join('');
+    const rowsHtml = rows.map(row => {
+      const cells = headers.map((_, i) => {
+        const v = row[i] ?? '';
+        return `<td>${esc(v)}</td>`;
+      }).join('');
       return `<tr>${cells}</tr>`;
     }).join('');
 
-    document.getElementById('tbody').innerHTML = rows || '<tr><td colspan="4" style="text-align:center; color:#999;">No data available</td></tr>';
-    document.getElementById('rowCount').textContent = queryDate ? `${stockData.length} stocks (${queryDate})` : 'No data';
+    document.getElementById('tbody').innerHTML = rowsHtml || '<tr><td colspan="5" style="text-align:center; color:#999;">No data available</td></tr>';
+    document.getElementById('rowCount').textContent = rows.length ? `${rows.length} rows` : 'No data';
   }
 
   function setDot(s) {
