@@ -54,7 +54,8 @@
       if (!vals.length) throw new Error('Sheet returned no data');
       const headers = vals[0] || [];
       const rows = vals.slice(1).filter(r => r && r.some(v => v));
-      console.log('Headers:', headers, 'Data rows:', rows.length);
+      console.log('Headers count:', headers.length, 'Headers:', headers);
+      console.log('Data rows:', rows.length);
       if (!rows.length) throw new Error('No data rows found');
       renderTable(headers, rows);
       setDot('ok'); setStatus(`${rows.length} rows loaded`);

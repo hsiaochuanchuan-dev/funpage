@@ -76,7 +76,7 @@ th:last-child { border-right: none; }
 td {
   padding: 9px 12px; font-size: 14px; color: #202124;
   border-bottom: 1px solid #e8eaed; border-right: 1px solid #e8eaed;
-  white-space: nowrap;
+  word-break: break-word;
 }
 td:last-child { border-right: none; }
 tr:nth-child(even) td { background: #fafafa; }
