@@ -50,13 +50,15 @@
       console.log('Response:', json);
       if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
       const vals = json.values || [];
-      console.log('Raw values:', vals);
-      if (!vals.length) throw new Error('Sheet returned no data');
-      const headers = vals[0] || [];
-      const rows = vals.slice(1).filter(r => r && r.some(v => v));
+      console.log('Raw values rows:', vals.length);
+      vals.forEach((row, i) => console.log('Row', i, ':', row));
+      if (vals.length < 3) throw new Error('Sheet needs at least 3 rows (date, headers, data)');
+      const headers = vals[1] || [];
+      const rows = vals.slice(2).filter(r => r && r.some(v => v));
       console.log('Headers count:', headers.length, 'Headers:', headers);
       console.log('Data rows:', rows.length);
-      if (!rows.length) throw new Error('No data rows found');
+      if (!headers.length) throw new Error('No headers in row 2');
+      if (!rows.length) throw new Error('No data found in rows 3+');
       renderTable(headers, rows);
       setDot('ok'); setStatus(`${rows.length} rows loaded`);
     } catch (err) {
