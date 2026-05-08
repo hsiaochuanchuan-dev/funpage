@@ -18,7 +18,7 @@
 <main>
   <div class="card">
     <div class="card-head">
-      <h2>Brokerage Ranking</h2>
+      <h2>Brokerage Ranking <span id="dateLabel" style="font-size:0.75em; font-weight:400; color:#6b7280; margin-left:0.5em;"></span></h2>
       <span id="rowCount"></span>
     </div>
     <div class="tbl-wrap">
@@ -36,67 +36,46 @@
   const SPREADSHEET_ID = '1pljY-of-ICBP8WQVgg8l5ICSpL3F6rMs3B8XJXdP2t4';
   const RANGE          = 'brokerage!A1:E12';
 
-  const SEED = [
-    ['Date', 'Code', 'Name', 'Reason'],
-  ];
-
   async function loadData() {
     setDot('spin'); setStatus('Loading data from Google Sheets…');
     try {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
-      console.log('Fetching:', url);
       const res  = await fetch(url);
       const json = await res.json();
-      console.log('Response:', json);
       if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
       const vals = json.values || [];
-      console.log('Raw values rows:', vals.length);
-      vals.forEach((row, i) => console.log('Row', i, ':', row));
       if (vals.length < 3) throw new Error('Sheet needs at least 3 rows (date, headers, data)');
+      const row1 = vals[0] || [];
+      const date = row1.find(v => v && /\d{4}[\/\-]\d{2}[\/\-]\d{2}/.test(v)) || row1[1] || row1[0] || '';
+      const dateEl = document.getElementById('dateLabel');
+      if (date) { dateEl.textContent = date; dateEl.style.display = 'inline'; }
+      else { dateEl.textContent = '(no date)'; dateEl.style.display = 'inline'; }
       const headers = vals[1] || [];
       const rows = vals.slice(2).filter(r => r && r.some(v => v));
-      console.log('Headers count:', headers.length, 'Headers:', headers);
-      console.log('Data rows:', rows.length);
       if (!headers.length) throw new Error('No headers in row 2');
       if (!rows.length) throw new Error('No data found in rows 3+');
       renderTable(headers, rows);
       setDot('ok'); setStatus(`${rows.length} rows loaded`);
     } catch (err) {
-      console.error('Error:', err.message);
       renderTable([], []);
       setDot('warn'); setStatus(`Error: ${err.message}`);
     }
   }
 
   function renderTable(headers, rows) {
-    console.log('Rendering table with', headers.length, 'columns');
-    const headerHtml = '<tr>' + headers.map((h, i) => {
-      console.log('Column', i, ':', h);
-      return `<th>${esc(h)}</th>`;
-    }).join('') + '</tr>';
-    document.getElementById('thead').innerHTML = headerHtml;
-
-    const rowsHtml = rows.map((row, rowIdx) => {
-      const cells = headers.map((_, i) => {
-        const v = row[i] ?? '';
-        return `<td>${esc(v)}</td>`;
-      }).join('');
-      return `<tr>${cells}</tr>`;
-    }).join('');
-
-    document.getElementById('tbody').innerHTML = rowsHtml || '<tr><td colspan="5" style="text-align:center; color:#999;">No data available</td></tr>';
-    console.log('Table rendered with', rows.length, 'rows and', headers.length, 'columns');
+    document.getElementById('thead').innerHTML = '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+    document.getElementById('tbody').innerHTML = rows.map(row =>
+      `<tr>${headers.map((_, i) => `<td>${esc(row[i] ?? '')}</td>`).join('')}</tr>`
+    ).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;">No data available</td></tr>';
     document.getElementById('rowCount').textContent = rows.length ? `${rows.length} rows × ${headers.length} columns` : 'No data';
   }
 
   function setDot(s) {
-    document.getElementById('dot').className =
-      'dot' + (s === 'spin' ? ' spin' : s === 'warn' ? ' warn' : '');
+    document.getElementById('dot').className = 'dot' + (s === 'spin' ? ' spin' : s === 'warn' ? ' warn' : '');
   }
   function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
   function esc(s) {
-    return String(s ?? '')
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   loadData();
