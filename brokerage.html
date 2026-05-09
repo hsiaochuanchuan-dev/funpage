@@ -9,7 +9,7 @@
 <body>
 <header>
   <h1>Brokerage Ranking</h1>
-  <sub>OtherNote › brokerage (A1:E12) | Day trading top 10 stocks</sub>
+  <sub id="headerSub">OtherNote › brokerage | Day trading top 10 stocks</sub>
 </header>
 <div class="statusbar">
   <div class="dot" id="dot"></div>
@@ -39,34 +39,59 @@
   async function loadData() {
     setDot('spin'); setStatus('Loading data from Google Sheets…');
     try {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
+      const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SPREADSHEET_ID +
+                  '/values/' + encodeURIComponent(RANGE) + '?key=' + API_KEY;
       const res  = await fetch(url);
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
+      if (!res.ok) throw new Error(json.error && json.error.message || 'HTTP ' + res.status);
       const vals = json.values || [];
-      if (vals.length < 3) throw new Error('Sheet needs at least 3 rows (date, headers, data)');
-      const headers = vals[1] || [];
-      const rows = vals.slice(2).filter(r => r && r.some(v => v));
-      if (!headers.length) throw new Error('No headers in row 2');
-      if (!rows.length) throw new Error('No data found in rows 3+');
+      if (vals.length < 3) throw new Error('No data');
+
+      // Date is in B1 (row 0, index 1)
+      var row1 = vals[0] || [];
+      var date = '';
+      for (var i = 0; i < row1.length; i++) {
+        if (row1[i] && row1[i].length >= 8) { date = row1[i]; break; }
+      }
+      if (date) {
+        document.getElementById('headerSub').textContent =
+          'OtherNote › brokerage | Day trading top 10 stocks | ' + date;
+        document.title = 'Brokerage Ranking ' + date;
+      }
+
+      var headers = vals[1] || [];
+      var rows = vals.slice(2).filter(function(r) {
+        return r && r.some(function(v) { return v; });
+      });
+      if (!headers.length) throw new Error('No headers');
+      if (!rows.length) throw new Error('No data rows');
       renderTable(headers, rows);
-      setDot('ok'); setStatus(`${rows.length} rows loaded`);
+      setDot('ok');
+      setStatus(rows.length + ' rows loaded' + (date ? ' · ' + date : ''));
     } catch (err) {
       renderTable([], []);
-      setDot('warn'); setStatus(`Error: ${err.message}`);
+      setDot('warn'); setStatus('Error: ' + err.message);
     }
   }
 
   function renderTable(headers, rows) {
-    document.getElementById('thead').innerHTML =
-      '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+    var th = '<tr>';
+    for (var i = 0; i < headers.length; i++) th += '<th>' + esc(headers[i]) + '</th>';
+    th += '</tr>';
+    document.getElementById('thead').innerHTML = th;
+
+    var tb = '';
+    for (var r = 0; r < rows.length; r++) {
+      tb += '<tr>';
+      for (var c = 0; c < headers.length; c++) {
+        tb += '<td>' + esc(rows[r][c] || '') + '</td>';
+      }
+      tb += '</tr>';
+    }
     document.getElementById('tbody').innerHTML =
-      rows.map(row =>
-        `<tr>${headers.map((_, i) => `<td>${esc(row[i] ?? '')}</td>`).join('')}</tr>`
-      ).join('') ||
-      '<tr><td colspan="5" style="text-align:center; color:#999;">No data available</td></tr>';
+      tb || '<tr><td colspan="5" style="text-align:center;color:#999;">No data available</td></tr>';
     document.getElementById('rowCount').textContent =
-      rows.length ? `${rows.length} rows × ${headers.length} columns` : 'No data';
+      rows.length ? rows.length + ' rows × ' + headers.length + ' columns' : 'No data';
   }
 
   function setDot(s) {
@@ -75,8 +100,8 @@
   }
   function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
   function esc(s) {
-    return String(s ?? '')
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   loadData();
