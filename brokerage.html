@@ -18,7 +18,7 @@
 <main>
   <div class="card">
     <div class="card-head">
-      <h2>Brokerage Ranking <span id="dateLabel" style="font-size:0.75em; font-weight:400; color:#6b7280; margin-left:0.5em;"></span></h2>
+      <h2>Brokerage Ranking</h2>
       <span id="rowCount"></span>
     </div>
     <div class="tbl-wrap">
@@ -45,11 +45,6 @@
       if (!res.ok) throw new Error(json.error?.message || `HTTP ${res.status}`);
       const vals = json.values || [];
       if (vals.length < 3) throw new Error('Sheet needs at least 3 rows (date, headers, data)');
-      const row1 = vals[0] || [];
-      const date = row1.find(v => v && /\d{4}[\/\-]\d{2}[\/\-]\d{2}/.test(v)) || row1[1] || row1[0] || '';
-      const dateEl = document.getElementById('dateLabel');
-      if (date) { dateEl.textContent = date; dateEl.style.display = 'inline'; }
-      else { dateEl.textContent = '(no date)'; dateEl.style.display = 'inline'; }
       const headers = vals[1] || [];
       const rows = vals.slice(2).filter(r => r && r.some(v => v));
       if (!headers.length) throw new Error('No headers in row 2');
@@ -63,19 +58,25 @@
   }
 
   function renderTable(headers, rows) {
-    document.getElementById('thead').innerHTML = '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
-    document.getElementById('tbody').innerHTML = rows.map(row =>
-      `<tr>${headers.map((_, i) => `<td>${esc(row[i] ?? '')}</td>`).join('')}</tr>`
-    ).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;">No data available</td></tr>';
-    document.getElementById('rowCount').textContent = rows.length ? `${rows.length} rows × ${headers.length} columns` : 'No data';
+    document.getElementById('thead').innerHTML =
+      '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+    document.getElementById('tbody').innerHTML =
+      rows.map(row =>
+        `<tr>${headers.map((_, i) => `<td>${esc(row[i] ?? '')}</td>`).join('')}</tr>`
+      ).join('') ||
+      '<tr><td colspan="5" style="text-align:center; color:#999;">No data available</td></tr>';
+    document.getElementById('rowCount').textContent =
+      rows.length ? `${rows.length} rows × ${headers.length} columns` : 'No data';
   }
 
   function setDot(s) {
-    document.getElementById('dot').className = 'dot' + (s === 'spin' ? ' spin' : s === 'warn' ? ' warn' : '');
+    document.getElementById('dot').className =
+      'dot' + (s === 'spin' ? ' spin' : s === 'warn' ? ' warn' : '');
   }
   function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
   function esc(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   loadData();
